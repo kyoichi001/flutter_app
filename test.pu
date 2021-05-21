@@ -1,0 +1,67 @@
+@startuml
+
+
+
+package save{
+    class FileSave
+    class SaveFileInfo
+    FileSave <|-- SaveFileInfo
+}
+
+package editor{
+    package canvas {
+        class DotCanvas
+        class CanvasHistory
+        class CanvasPainter
+        CanvasPainter <|-- DotCanvas
+    }
+
+    package palette{
+        class ColorPalette
+        class PaletteWidget
+        class PaletteEditor
+        PaletteWidget <|-- ColorPalette
+        PaletteEditor <|-- ColorPalette
+    }
+
+    package brush{
+        class BaseBrush
+        class BrushFactory
+    }
+
+    EditorPage <|-- DotCanvas
+    EditorPage <|-- ColorPalette
+    EditorPage <|-- FileSave
+    EditorPage <|-- MainEditorWidget
+
+    MainEditorWidget <|-- DotCanvas
+    MainEditorWidget <|-- ColorPalette
+    MainEditorWidget <|-- BaseBrush
+    MainEditorWidget <|-- CanvasHistory
+    MainEditorWidget <|-- ToolsWidget
+    MainEditorWidget <|-- CanvasPainter
+    MainEditorWidget <|-- PaletteWidget
+    MainEditorWidget <|-- BrushFactory
+    MainEditorWidget <|-- PaletteEditor
+    CanvasPainter <|-- ColorPalette
+
+    BaseBrush <|-- DotCanvas
+    BaseBrush <|-- ColorPalette
+
+    BrushFactory <|-- BaseBrush
+}
+
+MyApp <|-- MainWiget
+MainWiget <|-- HomePage
+MainWiget <|-- PaletteListPage
+HomePage <|-- FileSave
+HomePage <|-- WorkWidget
+HomePage <|-- EditorPage
+
+WorkWidget <|-- SaveFileInfo
+
+
+
+
+
+@enduml
