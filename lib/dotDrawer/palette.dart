@@ -9,7 +9,6 @@ class ColorPalette{
     Color.fromARGB(0, 0, 0, 0),//透明色
     Colors.white,
     Colors.grey,
-    Color.fromARGB(255, 80, 80, 80),
     Colors.black,
     Colors.red,
 

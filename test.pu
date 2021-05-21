@@ -13,8 +13,17 @@ package editor{
         class DotCanvas
         class CanvasHistory
         class CanvasPainter
+        package layer{
+            class LayerPainter
+            class CanvasLayer
+            LayerPainter <|-- CanvasLayer
+        }
         CanvasPainter <|-- DotCanvas
+        CanvasPainter <|-- CanvasLayer
+        CanvasPainter <|-- LayerPainter
+        DotCanvas <|-- CanvasLayer
     }
+
 
     package palette{
         class ColorPalette
@@ -44,6 +53,7 @@ package editor{
     MainEditorWidget <|-- BrushFactory
     MainEditorWidget <|-- PaletteEditor
     CanvasPainter <|-- ColorPalette
+    LayerPainter <|-- ColorPalette
 
     BaseBrush <|-- DotCanvas
     BaseBrush <|-- ColorPalette

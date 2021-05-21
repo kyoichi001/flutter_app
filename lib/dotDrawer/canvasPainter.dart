@@ -64,26 +64,11 @@ class LayerPainter extends CustomPainter{
     for (int y = 0; y < layer.sizeY; y++) {
       for (int x = 0; x < layer.sizeX; x++) {
         int colID = layer.getID(x, y);
+        _rectPaint.color = this.palette.cols[colID];
         if(_rectPaint.color.alpha==0){
-          _rectPaint.color =Colors.grey;
-          canvas.drawRect(
-              getCell(x, y, rectSize),
-              _rectPaint
-          );
-          canvas.drawRect(
-              getCell(x, y, rectSize),
-              _rectPaint
-          );
-          canvas.drawRect(
-              getCell(x, y, rectSize),
-              _rectPaint
-          );
+          drawTransparentCell(canvas, x, y, rectSize);
         }else{
-          _rectPaint.color = this.palette.cols[colID];
-          canvas.drawRect(
-              getCell(x, y, rectSize),
-              _rectPaint
-          );
+          drawCell(canvas,_rectPaint,x,y,rectSize);
         }
       }
     }
@@ -105,12 +90,31 @@ class LayerPainter extends CustomPainter{
     );
   }
 
-  void drawTransparentCell(Canvas canvas,Paint painter,int x,int y,double rectSize){
+  void drawTransparentCell(Canvas canvas,int x,int y,double rectSize){
+    Paint painter=Paint();
+    painter.color=Colors.grey;
     canvas.drawRect(
         Rect.fromCenter(
           center: Offset((x*rectSize).toDouble()+rectSize/2,(y*rectSize).toDouble()+rectSize/2),
           width: rectSize,
           height: rectSize,
+        ),
+        painter
+    );
+    painter.color=Colors.white;
+    canvas.drawRect(
+        Rect.fromCenter(
+          center: Offset((x*rectSize).toDouble()+rectSize/4*3,(y*rectSize).toDouble()+rectSize/4*3),
+          width: rectSize/2,
+          height: rectSize/2,
+        ),
+        painter
+    );
+    canvas.drawRect(
+        Rect.fromCenter(
+          center: Offset((x*rectSize).toDouble()+rectSize/4,(y*rectSize).toDouble()+rectSize/4),
+          width: rectSize/2,
+          height: rectSize/2,
         ),
         painter
     );

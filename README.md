@@ -1,16 +1,40 @@
-# flutter_app
+# ドット絵エディタ
 
-A new Flutter application.
+flutterの勉強がてらドット絵エディタを作成中です。
+Android用にリリースが目標。
 
-## Getting Started
+## 製作者
+- kyoichi
 
-This project is a starting point for a Flutter application.
+## ロードマップ
+### ver 1.0
+- 描画
+    - 透明色
+    - +16色
+- ブラシ
+    - ペン
+    - バケツ
+    - 矩形
+    - 円
+    - 直線
+    - スポイト
+- キャンバス操作
+    - 移動
+    - 反転（X軸, Y軸）
+    - 回転（右回転、左回転）
+    - クリア
+- undo/redo
+- 保存/読み込み
+- 作品プレビュー
 
-A few resources to get you started if this is your first Flutter project:
+### ver 1.1
+- カラーパレット編集
+- PNGエクスポート
+- ブラシ
+    - 選択範囲
+- ツール
+    - ミラー (X軸, Y軸)
+    - タイリング (X軸, Y軸)
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### ver 1.2
+- レイヤー

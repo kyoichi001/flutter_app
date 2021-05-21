@@ -43,7 +43,6 @@ class _SelectColorState extends State<PaletteWidget> {
         icon: Icon(Icons.edit),
         onPressed: widget.onEditorOpen
     );
-
   }
 
 }

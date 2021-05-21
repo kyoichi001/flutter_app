@@ -23,9 +23,6 @@ class MainEditorWidget extends StatefulWidget {
   MainEditorWidget({Key key, this.dotCanvas,this.palette,this.onSave}) : super(key: key);
   DotCanvas dotCanvas;
   ColorPalette palette;
-  BaseBrush brush;
-  CanvasHistory history;
-  ToolsWidget tools;
   Function onSave;
 
   @override
@@ -35,24 +32,27 @@ class MainEditorWidget extends StatefulWidget {
 class _MainEditorWidgetState extends State<MainEditorWidget> {
   var containerKey = GlobalKey();
   Cell currentCell;
+  BaseBrush brush;
+  CanvasHistory history;
+  ToolsWidget tools;
 
   @override
   void initState() {
     super.initState();
-    widget.brush = PaintBrush(widget.dotCanvas, widget.palette);
-    widget.history = CanvasHistory(widget.dotCanvas.sizeX, widget.dotCanvas.sizeY);
+    brush = PaintBrush(widget.dotCanvas, widget.palette);
+    history = CanvasHistory(widget.dotCanvas.sizeX, widget.dotCanvas.sizeY);
     addHistory();
   }
 
   @override
   Widget build(BuildContext context) {
-    widget.tools = ToolsWidget(
+    tools = ToolsWidget(
       onPressed: this._changeTools,
       onCanvasOptionPressed: this.onCanvasOptionSelected,
       onFileOptionSelect: this.onOptionSelected,
     );
-    widget.tools.redoEnable = widget.history.canRedo();
-    widget.tools.undoEnable = widget.history.canUndo();
+    tools.redoEnable = history.canRedo();
+    tools.undoEnable = history.canUndo();
 
     return Scaffold(
         body: Stack(
@@ -68,7 +68,7 @@ class _MainEditorWidgetState extends State<MainEditorWidget> {
                         onEditorOpen:this.openPaletteEditor,
                         palette: widget.palette,
                       ),
-                      widget.tools,
+                      tools,
                     ],
                   ),
                 ),
@@ -82,11 +82,11 @@ class _MainEditorWidgetState extends State<MainEditorWidget> {
                       children: [
                         Text(
                           "history current index:" +
-                              widget.history.currentIndex.toString(),
+                              history.currentIndex.toString(),
                         ),
                         Text(
                           "history length:" +
-                              widget.history.stack.length.toString(),
+                              history.stack.length.toString(),
                         ),
                         Text(
                           "is editing:" +
@@ -136,14 +136,14 @@ void openPaletteEditor() {
 }
   void _changeTools(int type) {
     if (type == ToolsID.pen) {
-      widget.brush =BrushFactory.getBrush(BrushType.pen,widget.dotCanvas,widget.palette);
+      setBrush(BrushType.pen);
     }
     else if (type == ToolsID.bucket) {
-      widget.brush = BrushFactory.getBrush(BrushType.bucket,widget.dotCanvas,widget.palette);
+      setBrush(BrushType.bucket);
     } else if (type == ToolsID.rect) {
-      widget.brush = BrushFactory.getBrush(BrushType.rect,widget.dotCanvas,widget.palette);
+      setBrush(BrushType.rect);
     } else if (type == ToolsID.circle) {
-      widget.brush = BrushFactory.getBrush(BrushType.circle,widget.dotCanvas,widget.palette);
+      setBrush(BrushType.circle);
     }
     else if (type == ToolsID.undo) {
       undo();
@@ -153,9 +153,9 @@ void openPaletteEditor() {
       widget.dotCanvas.clear();
       addHistory();
     } else if (type == ToolsID.line) {
-      widget.brush = BrushFactory.getBrush(BrushType.line,widget.dotCanvas,widget.palette);
+      setBrush(BrushType.line);
     } else if (type == ToolsID.spoit) {
-      widget.brush = BrushFactory.getBrush(BrushType.spoit,widget.dotCanvas,widget.palette);
+     setBrush(BrushType.spoit);
     }
   }
 
@@ -178,7 +178,7 @@ void openPaletteEditor() {
         addHistory();
       }
       else if (value == CanvasOption.move) {
-        widget.brush =BrushFactory.getBrush(BrushType.move,widget.dotCanvas,widget.palette);
+        setBrush(BrushType.move);
       }
     });
   }
@@ -226,14 +226,14 @@ void openPaletteEditor() {
   }
 
   void addHistory(){
-    widget.history.add(widget.dotCanvas.normal.ids);
+    history.add(widget.dotCanvas.normal.ids);
   }
 
   void _addPointTap(TapDownDetails details) {
     Cell pos = toPosition(details.localPosition);
     setState(() {
-      widget.brush.onPressEnter(pos.x, pos.y);
-      widget.brush.onPressExit(pos.x, pos.y);
+      brush.onPressEnter(pos.x, pos.y);
+      brush.onPressExit(pos.x, pos.y);
       addHistory();
     });
   }
@@ -241,7 +241,7 @@ void openPaletteEditor() {
   void _onPanStart(DragStartDetails details) {
     Cell pos = toPosition(details.localPosition);
     setState(() {
-      widget.brush.onPressEnter(pos.x, pos.y);
+      brush.onPressEnter(pos.x, pos.y);
     });
     currentCell = Cell(pos.x, pos.y);
   }
@@ -249,14 +249,14 @@ void openPaletteEditor() {
   void _addPointDrag(DragUpdateDetails details) {
     Cell pos = toPosition(details.localPosition);
     setState(() {
-      widget.brush.onPress(pos.x, pos.y);
+      brush.onPress(pos.x, pos.y);
     });
     currentCell = Cell(pos.x, pos.y);
   }
 
   void _onPressExit(DragEndDetails details) {
     setState(() {
-      widget.brush.onPressExit(currentCell.x, currentCell.y);
+      brush.onPressExit(currentCell.x, currentCell.y);
       addHistory();
     });
   }
@@ -270,8 +270,12 @@ void openPaletteEditor() {
     return Cell(x, y);
   }
 
+  void setBrush(BrushType type){
+    brush =BrushFactory.getBrush(type,widget.dotCanvas,widget.palette);
+  }
+
   void undo() {
-    List<int> prev = widget.history.pop();
+    List<int> prev = history.pop();
     setState(() {
       for (int i = 0; i < prev.length; i++) {
         widget.dotCanvas.preview.ids[i] = prev[i];
@@ -281,7 +285,7 @@ void openPaletteEditor() {
   }
 
   void redo() {
-    List<int> next = widget.history.back();
+    List<int> next = history.back();
     setState(() {
       for (int i = 0; i < next.length; i++) {
         widget.dotCanvas.preview.ids[i] = next[i];
