@@ -55,18 +55,28 @@ package editor{
     CanvasPainter <|-- ColorPalette
     LayerPainter <|-- ColorPalette
 
+    ToolsWidget <|-- ToolButton
+
     BaseBrush <|-- DotCanvas
     BaseBrush <|-- ColorPalette
 
     BrushFactory <|-- BaseBrush
 }
 
+package Works{
+    class HomePage
+    class WorkWidget
+    HomePage <|-- WorkWidget
+}
+
+
 MyApp <|-- MainWiget
 MainWiget <|-- HomePage
-MainWiget <|-- PaletteListPage
+MainWiget <|-- SettingsPage
 HomePage <|-- FileSave
-HomePage <|-- WorkWidget
 HomePage <|-- EditorPage
+
+SettingsPage <|-- FileSave
 
 WorkWidget <|-- SaveFileInfo
 

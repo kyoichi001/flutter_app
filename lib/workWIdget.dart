@@ -6,24 +6,122 @@ import 'package:flutter/material.dart';
 
 import 'filesave.dart';
 
-enum WorkOption{export, delete}
+enum WorkOption{rename,export, delete}
 
 class WorkWidget extends StatelessWidget {
 
-  SaveFileInfo info;
+  final SaveFileInfo info;
   Function(SaveFileInfo) onSelected;
+  Function(WorkOption) onOptionSelected;
 
-  WorkWidget({Key key, this.info,this.onSelected}) : super(key: key);
+  WorkWidget({Key key, this.info, this.onSelected,this.onOptionSelected}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        ElevatedButton(
-          child: Image.file(
-            info.loadPreview(),
+    var w=MediaQuery.of(context).size.width/2-10;
+    return Container(
+      width:w,
+      height:w+40,
+      alignment: Alignment.center,
+      padding: EdgeInsets.all(0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          new BoxShadow(
+            color: Colors.grey,
+            offset: new Offset(0.0, 5.0),
+            blurRadius: 10.0,
+          )
+        ],
+      ),
+      child: Column(
+        children: [
+          Expanded(
+            child:FlatButton(
+              minWidth: w,
+              height: w,
+              padding: EdgeInsets.all(0),
+              onPressed: () {
+                onSelected(info);
+              },
+              child: Container(
+                margin: EdgeInsets.all(0),
+                padding: EdgeInsets.all(0),
+                width: double.infinity,
+                height: double.infinity,
+                color:Colors.white,
+                child: Image.file(
+                  info.loadPreview(),
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
           ),
-          onPressed: (){onSelected(info);},
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  children: [
+                    Text(info.filename),
+                    Text(info.sizeX.toString() + "x" + info.sizeY.toString())
+                  ],
+                ),
+              ),
+              PopupMenuButton<WorkOption>
+                (
+                onSelected: onOptionSelected,
+                itemBuilder: (BuildContext context) =>
+                <PopupMenuEntry<WorkOption>>[
+                  const PopupMenuItem<WorkOption>(
+                    value: WorkOption.rename,
+                    child: ListTile(
+                        leading: Icon(Icons.edit),
+                        title: Text("rename")
+                    ),
+                  ),
+                  const PopupMenuItem<WorkOption>(
+                    value: WorkOption.export,
+                    child: ListTile(
+                        leading: Icon(Icons.save),
+                        title: Text("export")
+                    ),
+                  ),
+                  const PopupMenuItem<WorkOption>(
+                    value: WorkOption.delete,
+                    child: ListTile(
+                        leading: Icon(Icons.delete),
+                        title: Text("delete")
+                    ),
+                  ),
+                ],
+              )
+            ],
+
+          )
+        ],
+      ),
+    );
+  }
+}
+
+/*
+*  Column(
+
+      children: [
+        /**/
+        ButtonTheme(
+          minWidth: double.infinity,
+          child: OutlinedButton(
+            onPressed: () {
+              onSelected(info);
+            },
+
+              child:Image.file(
+                info.loadPreview(),
+                fit: BoxFit.contain ,
+              ),
+            ),
+          ),
         ),
         Row(
           children: [
@@ -61,9 +159,24 @@ class WorkWidget extends StatelessWidget {
         )
       ],
     );
-  }
+*
+* */
 
-  void onSelect(WorkOption option) {
-
-  }
-}
+/*
+FlatButton(
+      padding: EdgeInsets.all(0),
+        onPressed: () {
+          onSelected(info);
+        },
+          child:Container(
+            margin: EdgeInsets.all(0),
+            width: double.infinity,
+            height:double.infinity,
+            child: Image.file(
+              info.loadPreview(),
+              fit:BoxFit.cover,
+            ),
+            color:Colors.teal,
+          ),
+    );
+    */

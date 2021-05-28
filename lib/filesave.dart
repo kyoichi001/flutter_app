@@ -18,19 +18,21 @@ class SaveFileInfo {
   File loadPreview() {
     var file = File(thumbnailPath);
     if (!file.existsSync()) {
+      print("file not exist. Create new thumbnail");
       encodePNG(
           thumbnailPath,
           sizeX,
           sizeY,
           canvasData,
           palleteData,
-          sizeX,
-          sizeY);
+          128,
+          128);
     }
-    return File(thumbnailPath);
+    return file;
   }
 
   void fromJSON(Map<String, dynamic> json) {
+    filename=json["filename"];
     sizeX = json["sizeX"];
     sizeY = json["sizeY"];
     palleteData = json["palette"].cast<int>() as List<int>;
@@ -41,18 +43,18 @@ class SaveFileInfo {
 
 class FileSave{
 
-  List<FileSystemEntity> files=[];
-
-  String getNewFileName(){
-    return "file"+files.length.toString();
+  static Future<String> getNewFileName()async {
+    final directory = await getTemporaryDirectory();
+    var files = directory.listSync();
+    return "file"+files.length.toString()+".json";
   }
 
   //作品のリストを取得
-  Future<List<SaveFileInfo>> loadFiles()async {
+  static Future<List<SaveFileInfo>> loadFiles()async {
     try {
       List<SaveFileInfo> ans = [];
       final directory = await getTemporaryDirectory();
-      files = directory.listSync();
+      var files = directory.listSync();
       for (int i = 0; i < files.length; i++) {
         if (!files[i].path.endsWith(".json")) continue; //jsonファイルじゃなかったら飛ばす
         final file = File(files[i].path);
@@ -71,32 +73,34 @@ class FileSave{
     }
   }
 
-  void save(Map<String,dynamic> json,String filename){
+  static Future<void> save(SaveFileInfo info,String filename) async{
+    Map<String,dynamic> json=<String, dynamic>{
+      "filename":filename,
+      "format": "0.0.1",
+      "sizeX": info.sizeX,
+      "sizeY": info.sizeY,
+      "canvas": info.canvasData,
+      "palette": info.palleteData,
+    };
     var jsonText = jsonEncode(json);
     print("save file"+filename);
-    getFilePath(filename).then((File file) {
-      file.writeAsString(jsonText);
-    });
-  }
-
-//テキストファイルを保存するパスを取得する
-  Future<File> getFilePath(String filename) async {
     final directory = await getTemporaryDirectory();
-    return File(directory.path + '/' + filename+".json");
+    File(directory.path + '/' + filename).writeAsString(jsonText);
   }
 
-  Future<void> clearData() async{
-    try {
-      final directory = await getTemporaryDirectory();
-      files = directory.listSync();
-      for (int i = 0; i < files.length; i++) {
-        print("delete: "+files[i].path);
-        await files[i].delete();
-      }
-    } catch (e) {
-      // If encountering an error, return 0
-      print(e);
+  static Future<void> clearData() async{
+    final directory = await getTemporaryDirectory();
+   var  files = directory.listSync();
+    for (int i = 0; i < files.length; i++) {
+      await files[i].delete();
+      print("deleted: "+files[i].path);
     }
-
   }
+
+  static Future<void> delete(String filename) async{
+    final directory = await getTemporaryDirectory();
+    await File(directory.path + '/' + filename).delete();
+    print("deleted: "+filename);
+  }
+
 }

@@ -1,6 +1,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_app/filesave.dart';
+import 'package:path_provider/path_provider.dart';
+import '../encodeImg.dart';
 import 'dotcanvas.dart';
 import 'mainEditor.dart';
 import 'palette.dart';
@@ -8,8 +10,8 @@ import 'palette.dart';
 class EditorPage extends StatelessWidget with WidgetsBindingObserver {
   DotCanvas dotCanvas = DotCanvas();
   ColorPalette palette = ColorPalette();
-  FileSave saver = FileSave();
   String fileName;
+  ScaffoldMessengerState messenger;
 
   EditorPage({Key key, this.fileName, int sizeX, int sizeY,
     @required List<int> canvasData, @required List<int> colorPalette})
@@ -20,29 +22,64 @@ class EditorPage extends StatelessWidget with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    messenger=ScaffoldMessenger.of(context);
     return MainEditorWidget(
       dotCanvas: dotCanvas,
       palette: palette,
       onSave: save,
+      onExport: export,
     );
   }
 
-  Map<String, dynamic> toJSON() {
-    return <String, dynamic>{
-      "format": "0.0.1",
-      "sizeX": dotCanvas.sizeX,
-      "sizeY": dotCanvas.sizeY,
-      "canvas": dotCanvas.normal.ids,
-      "palette":palette.convert(),
-    };
-  }
-
   void save() {
-    saver.save(toJSON(), fileName);
+    SaveFileInfo saveData=SaveFileInfo();
+    saveData.filename=fileName;
+    saveData.sizeX=dotCanvas.sizeX;
+    saveData.sizeY=dotCanvas.sizeY;
+    saveData.canvasData=dotCanvas.normal.ids;
+    saveData.palleteData=palette.convert();
+
+    FileSave.save(saveData, fileName).then((void e) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text('file saved\n name:'+fileName),
+        ),
+      );
+    }).catchError((e){
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(e),
+        ),
+      );
+      print(e);
+    });
   }
 
   void export(){
-
+    //ちゃんとディレクトリ指定しないと許可がないのでエラー
+    getTemporaryDirectory().then((directory) {
+      encodePNG(
+          fileName,
+          dotCanvas.sizeX,
+          dotCanvas.sizeY,
+          dotCanvas.normal.ids,
+          palette.convert(),
+          dotCanvas.sizeX,
+          dotCanvas.sizeX
+      );
+      messenger.showSnackBar(
+        SnackBar(
+          content: const Text('png exported'),
+        ),
+      );
+    }).catchError((e){
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(e),
+        ),
+      );
+      print(e);
+    });
   }
 
   @override

@@ -5,22 +5,91 @@ import 'workWIdget.dart';
 import 'dotDrawer/editorPage.dart';
 
 class HomePage extends StatefulWidget {
-  FileSave fileSaver=FileSave();
   HomePage({Key key}) : super(key: key);
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<HomePage> {
-  List<Widget> _list=[];
-  Future<List<SaveFileInfo>> _future;
-  @override
-  void initState(){
-    _future = asyncSampleMethod();
-  }
 
-  Future<List<SaveFileInfo>> asyncSampleMethod() async {
-    return await widget.fileSaver.loadFiles();
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: FutureBuilder(
+          future: FileSave.loadFiles(),
+          builder: (BuildContext context,
+              AsyncSnapshot<List<SaveFileInfo>> snapshot) {
+            List<Widget> list = [];
+            // 通信中はスピナーを表示
+            if (snapshot.connectionState != ConnectionState.done) {
+              return CircularProgressIndicator();
+            }
+            if (snapshot.hasData) {
+              for (int i = 0; i < snapshot.data.length; i++) {
+                list.add(
+                  WorkWidget(
+                    info: snapshot.data[i],
+                    onSelected: workWidgetSelected,
+                    onOptionSelected: (var option) {
+                      if (option == WorkOption.export) {
+
+                      } else if (option == WorkOption.delete) {
+                        showDialog(
+                          context: context,
+                          builder: (_) {
+                            return AlertDialog(
+                              title: Text("確認"),
+                              content: Text("削除しますか？"),
+                              actions: <Widget>[
+                                // ボタン領域
+                                TextButton(
+                                  child: Text("Cancel"),
+                                  onPressed: () => Navigator.pop(context),
+                                ),
+                                TextButton(
+                                  child: Text("OK"),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                    FileSave.delete(snapshot.data[i].filename)
+                                        .then((void e) {
+                                      setState(() {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: const Text('data deleted'),
+                                          ),
+                                        );
+                                      });
+                                    });
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      } else if (option == WorkOption.rename) {
+
+                      }
+                    },
+                  ),
+                );
+              }
+              return Wrap(
+                spacing: 5,
+                direction: Axis.horizontal,
+                children: list,
+              );
+            } else {
+              return Text("there is no item");
+            }
+          }),
+      floatingActionButton: FloatingActionButton(
+        heroTag: "new item",
+        onPressed: newItem,
+        tooltip: 'new item',
+        child: Icon(Icons.add),
+      ),
+    );
   }
 
   Future<void> newItem() async {
@@ -32,9 +101,9 @@ class _MyHomePageState extends State<HomePage> {
             content: SingleChildScrollView(
               child: ListBody(
                 children: <Widget>[
-                  getButton(16,16),
-                  getButton(32,32),
-                  getButton(64,64),
+                  getButton(16, 16),
+                  getButton(32, 32),
+                  getButton(64, 64),
                 ],
               ),
             ),
@@ -42,86 +111,50 @@ class _MyHomePageState extends State<HomePage> {
         }
     );
   }
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        body: Center(
-          child: FutureBuilder(
-              future: _future,
-              builder: (BuildContext context, AsyncSnapshot<List<SaveFileInfo>> snapshot) {
-                Widget childWidget;
-                if (snapshot.hasData) {
-                  _list.clear();
-                  for (int i = 0; i < snapshot.data.length; i++) {
-                    _list.add(
-                        WorkWidget(info: snapshot.data[i])
-                    );
-                  }
-                  childWidget = GridView.builder(
-                    itemCount: _list.length,
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                    ),
-                    itemBuilder: (context, index) {
-                      return Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black45),
-                        ),
-                        child: _list[index],
-                      );
-                    },
-                  );
-                } else {
-                  childWidget = const CircularProgressIndicator();
-                }
-                return childWidget;
-              }),
-        ),
-        floatingActionButton: Column(
-          verticalDirection: VerticalDirection.up, // childrenの先頭を下に配置
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            FloatingActionButton(
-              onPressed: newItem,
-              tooltip: 'new item',
-              child: Icon(Icons.add),
-            ),
-            FloatingActionButton(
-              onPressed: clearData,
-              tooltip: 'clear item',
-              child: Icon(Icons.delete),
-            ),
-          ],
+
+  void workWidgetSelected(SaveFileInfo info) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) =>
+              EditorPage(
+                fileName: info.filename,
+                sizeX: info.sizeX,
+                sizeY: info.sizeY,
+                canvasData: info.canvasData,
+                colorPalette: info.palleteData,
+              ),
         )
     );
   }
 
-
-  void clearData(){
-    widget.fileSaver.clearData().then(
-        (void e){
-          setState(() {});
-        }
-    );
-  }
-  Widget getButton(int sizeX,int sizeY){
+  Widget getButton(int sizeX, int sizeY) {
     return TextButton(
-      child:Text(sizeX.toString()+"x"+sizeY.toString()),
-      onPressed: (){
-        Navigator.pop(context);//popupを削除
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => EditorPage(
-                fileName: widget.fileSaver.getNewFileName(),
-                sizeX: sizeX,
-                sizeY: sizeY,
-                canvasData: [],
-                colorPalette: [],
-              ),
-            )
-        );
+      child: Text(sizeX.toString() + "x" + sizeY.toString()),
+      onPressed: () {
+        sceneChange(sizeX, sizeY);
       },
     );
   }
+
+  void sceneChange(int sizeX, int sizeY) {
+    FileSave.getNewFileName().then((String filename) {
+      Navigator.pop(context); //popupを削除
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) {
+                return EditorPage(
+                  fileName: filename,
+                  sizeX: sizeX,
+                  sizeY: sizeY,
+                  canvasData: [],
+                  colorPalette: [],
+                );
+              }
+          )
+      );
+    });
+  }
+
 }

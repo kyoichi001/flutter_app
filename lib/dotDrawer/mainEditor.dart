@@ -4,9 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/dotDrawer/palette.dart';
 import 'package:flutter_app/dotDrawer/paletteEditor.dart';
 import 'package:flutter_app/dotDrawer/toolbarWidget.dart';
-import 'package:path_provider/path_provider.dart';
 
-import '../encodeImg.dart';
 import 'brush/basebrush.dart';
 import 'brush/brushFactory.dart';
 import 'brush/paint.dart';
@@ -15,15 +13,14 @@ import 'canvasPainter.dart';
 import 'paletteWidget.dart';
 import 'dotcanvas.dart';
 
-import 'package:fluttertoast/fluttertoast.dart';
-
 GlobalKey globalKey = GlobalKey();
 
 class MainEditorWidget extends StatefulWidget {
-  MainEditorWidget({Key key, this.dotCanvas,this.palette,this.onSave}) : super(key: key);
+  MainEditorWidget({Key key, this.dotCanvas,this.palette,this.onSave,this.onExport}) : super(key: key);
   DotCanvas dotCanvas;
   ColorPalette palette;
   Function onSave;
+  Function onExport;
 
   @override
   _MainEditorWidgetState createState() => _MainEditorWidgetState();
@@ -41,7 +38,7 @@ class _MainEditorWidgetState extends State<MainEditorWidget> {
     super.initState();
     brush = PaintBrush(widget.dotCanvas, widget.palette);
     history = CanvasHistory(widget.dotCanvas.sizeX, widget.dotCanvas.sizeY);
-    addHistory();
+    addHistory();//初期状態を記録
   }
 
   @override
@@ -62,11 +59,28 @@ class _MainEditorWidgetState extends State<MainEditorWidget> {
                   width: 500,
                   child: Column(
                     children: [
-                      getCanvas(),
-                      PaletteWidget(
-                        onButtonPressed: this._changeColor,
-                        onEditorOpen:this.openPaletteEditor,
-                        palette: widget.palette,
+                      Stack(
+                        children: [
+                          Positioned.fill(
+                            child:Image.asset(
+                              "images/transparent.png",
+                              repeat: ImageRepeat.repeat,
+                            ),
+                          ),
+                          getCanvas(),
+                        ],
+                      ),
+                      Container(
+                        padding: EdgeInsets.all(5),
+                        child:PaletteWidget(
+                          onButtonPressed: this._changeColor,
+                          onEditorOpen: this.openPaletteEditor,
+                          palette: widget.palette,
+                        ),
+                      ),
+                      const Divider(
+                        height: 5,
+                        thickness: 1,
                       ),
                       tools,
                     ],
@@ -108,12 +122,12 @@ class _MainEditorWidgetState extends State<MainEditorWidget> {
           key: globalKey,
           onTapDown: _addPointTap,
           onPanStart: _onPanStart,
-          onPanUpdate: _addPointDrag,
-          onPanEnd: _onPressExit,
+          onPanUpdate: _onPan,
+          onPanEnd: _onPanEnd,
           child: Container(
             width: 500,
             height: 500,
-            margin:const EdgeInsets.all(10.0),
+            margin: const EdgeInsets.all(10.0),
             child: CustomPaint(
               painter: CanvasPainter(
                   this.widget.dotCanvas, this.widget.palette
@@ -123,17 +137,19 @@ class _MainEditorWidgetState extends State<MainEditorWidget> {
       ),
     );
   }
-void openPaletteEditor() {
-  Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) =>
-        (
-            PaletteEditor(canvas: widget.dotCanvas,palette: widget.palette,)
-        ),
-      )
-  );
-}
+
+  void openPaletteEditor() {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) =>
+          (
+              PaletteEditor(canvas: widget.dotCanvas, palette: widget.palette,)
+          ),
+        )
+    );
+  }
+
   void _changeTools(int type) {
     if (type == ToolsID.pen) {
       setBrush(BrushType.pen);
@@ -155,7 +171,7 @@ void openPaletteEditor() {
     } else if (type == ToolsID.line) {
       setBrush(BrushType.line);
     } else if (type == ToolsID.spoit) {
-     setBrush(BrushType.spoit);
+      setBrush(BrushType.spoit);
     }
   }
 
@@ -186,37 +202,15 @@ void openPaletteEditor() {
   void onOptionSelected(FileOption option) {
     if (option == FileOption.save) {
       widget.onSave();
-    } else if (option == FileOption.load) {
+    } else if (option == FileOption.load) {//画像からよみこみ
 
     }
     else if (option == FileOption.editPalette) {
       this.openPaletteEditor();
     } else if (option == FileOption.export) {
-      //ちゃんとディレクトリ指定しないと許可がないのでエラー
-      getTemporaryDirectory().then((directory) {
-        try {
-          encodePNG(
-              directory.path + "/test.png",
-              widget.dotCanvas.sizeX,
-              widget.dotCanvas.sizeY,
-              widget.dotCanvas.normal.ids,
-              widget.palette.convert(),
-              16,
-              16);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text('png exported'),
-            ),
-          );
-        } catch (e) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(e),
-            ),
-          );
-        }
-      });
+      widget.onExport();
     } else if (option == FileOption.close) {
+      widget.onSave();
       Navigator.pop(context);
     }
   }
@@ -225,11 +219,12 @@ void openPaletteEditor() {
     widget.palette.currentColor = id;
   }
 
-  void addHistory(){
+  void addHistory() {
     history.add(widget.dotCanvas.normal.ids);
   }
 
   void _addPointTap(TapDownDetails details) {
+    print("on tap");
     Cell pos = toPosition(details.localPosition);
     setState(() {
       brush.onPressEnter(pos.x, pos.y);
@@ -239,6 +234,7 @@ void openPaletteEditor() {
   }
 
   void _onPanStart(DragStartDetails details) {
+    print("on pan start");
     Cell pos = toPosition(details.localPosition);
     setState(() {
       brush.onPressEnter(pos.x, pos.y);
@@ -246,7 +242,8 @@ void openPaletteEditor() {
     currentCell = Cell(pos.x, pos.y);
   }
 
-  void _addPointDrag(DragUpdateDetails details) {
+  void _onPan(DragUpdateDetails details) {
+    print("on drag");
     Cell pos = toPosition(details.localPosition);
     setState(() {
       brush.onPress(pos.x, pos.y);
@@ -254,7 +251,8 @@ void openPaletteEditor() {
     currentCell = Cell(pos.x, pos.y);
   }
 
-  void _onPressExit(DragEndDetails details) {
+  void _onPanEnd(DragEndDetails details) {
+    print("on pan end");
     setState(() {
       brush.onPressExit(currentCell.x, currentCell.y);
       addHistory();
@@ -270,8 +268,8 @@ void openPaletteEditor() {
     return Cell(x, y);
   }
 
-  void setBrush(BrushType type){
-    brush =BrushFactory.getBrush(type,widget.dotCanvas,widget.palette);
+  void setBrush(BrushType type) {
+    brush = BrushFactory.getBrush(type, widget.dotCanvas, widget.palette);
   }
 
   void undo() {

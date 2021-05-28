@@ -47,10 +47,10 @@ class DotCanvas {
   void clear() {
     for (int y = 0; y < sizeY; y++) {
       for (int x = 0; x < sizeX; x++) {
-        setID(x, y, 0);
+        preview.setID(x, y, 0);
+        normal.setID(x, y, 0);
       }
     }
-    apply();
   }
 
   int getID(int x, int y) {

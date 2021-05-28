@@ -21,6 +21,29 @@ class ToolsID {
   static const int line=11;
 }
 
+class ToolButton extends StatelessWidget {
+  Function onPressed;
+  IconData icon;
+
+  ToolButton({Key key, this.onPressed, this.icon})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        width: 50,
+        child: AspectRatio(
+          aspectRatio: 1 / 1,
+          child:
+          ElevatedButton(
+            onPressed: onPressed,
+            child: Icon(icon),
+          ),
+        )
+    );
+  }
+}
+
 class ToolsWidget extends StatelessWidget {
   Function(int) onPressed;
   Function(CanvasOption) onCanvasOptionPressed;
@@ -37,62 +60,62 @@ class ToolsWidget extends StatelessWidget {
     return Wrap(
       direction:Axis.horizontal,
       children: [
-        ElevatedButton(
-            onPressed: () {
+        ToolButton(
+            onPressed:  () {
               onPressed(ToolsID.pen);
             },
-            child: Icon(Icons.brush)
+            icon:Icons.brush
         ),
-        ElevatedButton(
-            onPressed: () {
+        ToolButton(
+            onPressed:  () {
               onPressed(ToolsID.bucket);
             },
-            child: Icon(Icons.format_color_fill)
+            icon:Icons.format_color_fill
         ),
-        ElevatedButton(
-            onPressed: () {
+        ToolButton(
+            onPressed:  () {
               onPressed(ToolsID.rect);
             },
-            child: Icon(Icons.crop_square)
+            icon:Icons.crop_square
         ),
-        ElevatedButton(
-            onPressed: () {
+        ToolButton(
+            onPressed:  () {
               onPressed(ToolsID.circle);
             },
-            child: Icon(Icons.circle)
+            icon:Icons.circle
         ),
-        ElevatedButton(
-            onPressed: () {
+        ToolButton(
+            onPressed:  () {
               onPressed(ToolsID.line);
             },
-            child: Icon(Icons.horizontal_rule_outlined)
+            icon:Icons.horizontal_rule_outlined
         ),
-        ElevatedButton(
-            onPressed: () {
+        ToolButton(
+            onPressed:  () {
               onPressed(ToolsID.clear);
             },
-            child: Icon(Icons.clear)
+            icon:Icons.clear
         ),
-        ElevatedButton(
-            onPressed: () {
+        ToolButton(
+            onPressed:  () {
               onPressed(ToolsID.spoit);
             },
-            child: Icon(Icons.touch_app)
+            icon:Icons.touch_app
         ),
         CanvasOptionWidget(
           onSelect: onCanvasOptionPressed,
         ),
-        ElevatedButton(
-          onPressed: !undoEnable ? null : () {
-            onPressed(ToolsID.undo);
-          },
-          child: Icon(Icons.undo),
+        ToolButton(
+            onPressed: !undoEnable ? null : () {
+              onPressed(ToolsID.undo);
+            },
+            icon:Icons.undo
         ),
-        ElevatedButton(
+        ToolButton(
             onPressed: !redoEnable ? null : () {
               onPressed(ToolsID.redo);
             },
-            child: Icon(Icons.redo)
+            icon:Icons.redo
         ),
         OptionWidget(onSelect: onFileOptionSelect,)
       ],
@@ -175,7 +198,7 @@ class OptionWidget extends StatelessWidget {
                 title:Text("save")
             ),
           ),
-          const PopupMenuItem<FileOption>(
+          /*const PopupMenuItem<FileOption>(
             value: FileOption.load,
             child: ListTile(
                 leading:Icon(Icons.file_download),
@@ -195,7 +218,7 @@ class OptionWidget extends StatelessWidget {
                 leading:Icon(Icons.outbox),
                 title:Text("export")
             ),
-          ),
+          ),*/
           const PopupMenuItem<FileOption>(
             value: FileOption.close,
             child: ListTile(

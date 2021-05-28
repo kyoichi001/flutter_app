@@ -23,6 +23,11 @@ class CanvasPainter extends CustomPainter{
     double rectSize = size.width / dotCanvas.sizeX;
     normal.paint(canvas, size);
     preview.paint(canvas, size);
+    drawGrid(canvas,size);
+  }
+
+  void drawGrid(Canvas canvas,Size size){
+    double rectSize = size.width / dotCanvas.sizeX;
 
     for (int i = 0; i <= dotCanvas.sizeX; i++) {
       canvas.drawLine(Offset(i * rectSize.toDouble(), 0),
@@ -65,11 +70,7 @@ class LayerPainter extends CustomPainter{
       for (int x = 0; x < layer.sizeX; x++) {
         int colID = layer.getID(x, y);
         _rectPaint.color = this.palette.cols[colID];
-        if(_rectPaint.color.alpha==0){
-          drawTransparentCell(canvas, x, y, rectSize);
-        }else{
-          drawCell(canvas,_rectPaint,x,y,rectSize);
-        }
+        drawCell(canvas,_rectPaint,x,y,rectSize);
       }
     }
   }
@@ -90,6 +91,9 @@ class LayerPainter extends CustomPainter{
     );
   }
 
+}
+
+/*
   void drawTransparentCell(Canvas canvas,int x,int y,double rectSize){
     Paint painter=Paint();
     painter.color=Colors.grey;
@@ -119,4 +123,4 @@ class LayerPainter extends CustomPainter{
         painter
     );
   }
-}
+  */

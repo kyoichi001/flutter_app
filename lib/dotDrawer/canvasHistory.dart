@@ -5,9 +5,9 @@ class CanvasHistory {
   int sizeX;
   int sizeY;
 
-  int currentIndex = 0;
+  int currentIndex = -1;
 
-  List<List<int>> stack = [[]];
+  List<List<int>> stack = [];
 
   CanvasHistory(this.sizeX, this.sizeY);
 
@@ -16,8 +16,8 @@ class CanvasHistory {
     for (int i = 0; i < data.length; i++) {//引数をコピー
       clone.add(data[i]);
     }
-
-    for (int i = currentIndex; i < stack.length - 1; i++) { //redoを消去
+    int length= stack.length;
+    for (int i = currentIndex+1; i <length; i++) { //redoを消去
       stack.removeLast();
     }
     stack.add(clone);
@@ -36,7 +36,7 @@ class CanvasHistory {
 
   //最初の要素はキャンバスの初期値（削除されると最初の状態が上書きされてしまう）
   bool canUndo() {
-    return currentIndex > 1;
+    return currentIndex > 0;
   }
 
   bool canRedo() {
