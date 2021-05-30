@@ -17,23 +17,26 @@ class CircleBrush extends BaseBrush {
     canvas.cancel();
     var end = Cell(x_, y_);
     var lb = Cell(min(start.x, end.x), min(start.y, end.y));
-    var rt = Cell(max(start.x, end.x)+1, max(start.y, end.y)+1);
+    var rt = Cell(max(start.x, end.x) + 1, max(start.y, end.y) + 1);
 
     var center = Offset((lb.x + rt.x) / 2, (lb.y + rt.y) / 2);
-    double r = rt.x - center.dx;
-    int y0 = center.dy.floor();
-    int x = rt.x;
-    for(int y=y0;y<=x;y++){
-      canvas.setID(x,y, palette.currentColor);
-      canvas.setID(x,-y, palette.currentColor);
-      canvas.setID(-x,y, palette.currentColor);
-      canvas.setID(-x,-y, palette.currentColor);
-      canvas.setID(y,x, palette.currentColor);
-      canvas.setID(y,-x, palette.currentColor);
-      canvas.setID(-y,x, palette.currentColor);
-      canvas.setID(-y,-x, palette.currentColor);
-      if (RE(x - 1, y + 1, r) < RE(x, y + 1, r)) {
-        x-=1;
+    double xr = (rt.x - center.dx).abs();
+    double yr = (rt.y - center.dy).abs();
+    int y0 = 0;
+    int x = xr.floor();
+    int xCenter = center.dx.floor();
+    int yCenter = center.dy.floor();
+    for (int y = y0; y <= x; y++) {
+      canvas.setID(x + xCenter, y + yCenter, palette.currentColor);
+      canvas.setID(x + xCenter, -y + yCenter, palette.currentColor);
+      canvas.setID(-x + xCenter, y + yCenter, palette.currentColor);
+      canvas.setID(-x + xCenter, -y + yCenter, palette.currentColor);
+      canvas.setID(y + xCenter, x + yCenter, palette.currentColor);
+      canvas.setID(y + xCenter, -x + yCenter, palette.currentColor);
+      canvas.setID(-y + xCenter, x + yCenter, palette.currentColor);
+      canvas.setID(-y + xCenter, -x + yCenter, palette.currentColor);
+      if (RE(x - 1, y + 1, xr,yr) < RE(x, y + 1, xr,yr)) {
+        x -= 1;
       }
     }
   }
@@ -49,8 +52,11 @@ class CircleBrush extends BaseBrush {
   }
 
 
-  double RE(int x,int y, double r) {
-    return (x * x + y * y - r * r).abs();
+  double RE(int x, int y, double xr,double yr) {
+    return (
+        x * x * yr * yr +
+        y * y * xr * xr -
+        xr * xr * yr * yr).abs();
   }
 
 }
