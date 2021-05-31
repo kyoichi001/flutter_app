@@ -14,6 +14,10 @@ class _MyHomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    print("Works rebuilt");
+    //実行しないとサムネが適用されない
+    imageCache.clear();
+    imageCache.clearLiveImages();
     return Scaffold(
       body: FutureBuilder(
           future: FileSave.loadFiles(),
@@ -22,73 +26,93 @@ class _MyHomePageState extends State<HomePage> {
             List<Widget> list = [];
             // 通信中はスピナーを表示
             if (snapshot.connectionState != ConnectionState.done) {
-              return CircularProgressIndicator();
+              return const Center(
+                  child: CircularProgressIndicator()
+              );
             }
             if (snapshot.hasData) {
-              for (int i = 0; i < snapshot.data.length; i++) {
-                list.add(
-                  WorkWidget(
-                    info: snapshot.data[i],
-                    onSelected: workWidgetSelected,
-                    onOptionSelected: (var option) {
-                      if (option == WorkOption.export) {
-
-                      } else if (option == WorkOption.delete) {
-                        showDialog(
-                          context: context,
-                          builder: (_) {
-                            return AlertDialog(
-                              title: Text("確認"),
-                              content: Text("削除しますか？"),
-                              actions: <Widget>[
-                                // ボタン領域
-                                TextButton(
-                                  child: Text("Cancel"),
-                                  onPressed: () => Navigator.pop(context),
-                                ),
-                                TextButton(
-                                  child: Text("OK"),
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                    FileSave.delete(snapshot.data[i].filename)
-                                        .then((void e) {
-                                      setState(() {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          SnackBar(
-                                            content: const Text('data deleted'),
-                                          ),
-                                        );
-                                      });
-                                    });
-                                  },
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      } else if (option == WorkOption.rename) {
-
-                      }
-                    },
-                  ),
+              if (snapshot.data.length == 0) {
+                return const Center(
+                    child: Text("there is no item")
                 );
               }
-              return Wrap(
+              for (int i = 0; i < snapshot.data.length; i++) {
+                list.add(
+                    getWorkWidget(snapshot.data[i])
+                );
+              }
+              return GridView.builder(
+                  itemCount: list.length,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                  ),
+                  itemBuilder: (BuildContext context, int index) {
+                    return list[index];
+                  });
+              /*return Wrap(
                 spacing: 5,
                 direction: Axis.horizontal,
                 children: list,
-              );
+              );*/
             } else {
-              return Text("there is no item");
+              return const Center(
+                  child: Text("there is no item")
+              );
             }
           }),
       floatingActionButton: FloatingActionButton(
         heroTag: "new item",
         onPressed: newItem,
         tooltip: 'new item',
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
+    );
+  }
+  
+  Widget getWorkWidget(SaveFileInfo info) {
+    return WorkWidget(
+        info: info,
+        onSelected: (info) {
+          workWidgetSelected(info);
+        },
+        onOptionSelected: (var option) {
+          if (option == WorkOption.export) {
+
+          } else if (option == WorkOption.delete) {
+            showDialog(
+              context: context,
+              builder: (_) {
+                return AlertDialog(
+                  title: const Text("確認"),
+                  content:const  Text("削除しますか？"),
+                  actions: <Widget>[
+                    // ボタン領域
+                    TextButton(
+                      child: const Text("Cancel"),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                    TextButton(
+                      child: const Text("OK"),
+                      onPressed: () async {
+                        Navigator.pop(context);
+                        await FileSave.delete(info.filename);
+                        setState(() {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: const Text('data deleted'),
+                            ),
+                          );
+                        });
+                      },
+                    ),
+                  ],
+                );
+              },
+            );
+          } else if (option == WorkOption.rename) {
+
+          }
+        }
     );
   }
 
@@ -111,11 +135,12 @@ class _MyHomePageState extends State<HomePage> {
         }
     );
   }
-
-  void workWidgetSelected(SaveFileInfo info) {
-    Navigator.push(
+//https://qiita.com/sjiro/items/d2bbceac0c27c71f7b2e
+  void workWidgetSelected(SaveFileInfo info) async {
+    print("page changing");
+    final result=await Navigator.push(
         context,
-        MaterialPageRoute(
+        MaterialPageRoute<bool>(
           builder: (context) =>
               EditorPage(
                 fileName: info.filename,
@@ -126,6 +151,10 @@ class _MyHomePageState extends State<HomePage> {
               ),
         )
     );
+    print("page returned");
+    if(result){
+      setState(() {});
+    }
   }
 
   Widget getButton(int sizeX, int sizeY) {
@@ -137,24 +166,29 @@ class _MyHomePageState extends State<HomePage> {
     );
   }
 
-  void sceneChange(int sizeX, int sizeY) {
-    FileSave.getNewFileName().then((String filename) {
-      Navigator.pop(context); //popupを削除
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) {
-                return EditorPage(
-                  fileName: filename,
-                  sizeX: sizeX,
-                  sizeY: sizeY,
-                  canvasData: [],
-                  colorPalette: [],
-                );
-              }
-          )
-      );
-    });
+  void sceneChange(int sizeX, int sizeY) async {
+    print("page changing");
+    String filename=await FileSave.getNewFileName();
+
+    Navigator.pop(context); //popupを削除
+    final result=await Navigator.push(
+        context,
+        MaterialPageRoute<bool>(
+            builder: (context) {
+              return EditorPage(
+                fileName: filename,
+                sizeX: sizeX,
+                sizeY: sizeY,
+                canvasData: [],
+                colorPalette: [],
+              );
+            }
+        )
+    );
+    print("page returned");
+    if(result){
+      setState(() {});
+    }
   }
 
 }

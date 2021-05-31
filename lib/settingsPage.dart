@@ -11,7 +11,7 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
 
-  bool nightmode=false;
+  bool nightMode=false;
 
   @override
   Widget build(BuildContext context) {
@@ -25,15 +25,15 @@ class _SettingsPageState extends State<SettingsPage> {
                 onPressed:clearData ,
                 child: Text("delete all files")
             ),
-            SwitchListTile(
+            /*SwitchListTile(
               title: const Text('Lights'),
-              value: nightmode,
+              value: nightMode,
               onChanged: (bool value) {
                 setState(() {
-                  nightmode = value;
+                  nightMode = value;
                 });
               },
-            )
+            )*/
           ],
         )
     );

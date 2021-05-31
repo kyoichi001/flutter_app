@@ -1,4 +1,6 @@
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_app/filesave.dart';
 import 'package:path_provider/path_provider.dart';
@@ -31,7 +33,7 @@ class EditorPage extends StatelessWidget with WidgetsBindingObserver {
     );
   }
 
-  void save() {
+  Future<void> save() async {
     SaveFileInfo saveData=SaveFileInfo();
     saveData.filename=fileName;
     saveData.sizeX=dotCanvas.sizeX;
@@ -39,20 +41,21 @@ class EditorPage extends StatelessWidget with WidgetsBindingObserver {
     saveData.canvasData=dotCanvas.normal.ids;
     saveData.palleteData=palette.convert();
 
-    FileSave.save(saveData, fileName).then((void e) {
+    try{
+      await FileSave.save(saveData, fileName);
       messenger.showSnackBar(
         SnackBar(
           content: Text('file saved\n name:'+fileName),
         ),
       );
-    }).catchError((e){
+    }catch(e){
       messenger.showSnackBar(
         SnackBar(
-          content: Text(e),
+          content: Text(e.toString()),
         ),
       );
       print(e);
-    });
+    }
   }
 
   void export(){
@@ -72,10 +75,10 @@ class EditorPage extends StatelessWidget with WidgetsBindingObserver {
           content: const Text('png exported'),
         ),
       );
-    }).catchError((e){
+    }).catchError(( e){
       messenger.showSnackBar(
         SnackBar(
-          content: Text(e),
+          content: Text(e.toString()),
         ),
       );
       print(e);

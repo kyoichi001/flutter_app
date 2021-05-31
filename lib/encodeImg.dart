@@ -7,7 +7,7 @@ import 'package:image/image.dart' as ImgLib;
 
 //path ex) test.png
 void encodePNG(String path,int sizeX,int sizeY,List<int> canvas,List<int> palette, int encodeSizeX,int encodeSizeY) {
-  print("png encoding" + path);
+  print("png encoding : " + path);
   ImgLib.Image image = ImgLib.Image(encodeSizeX, encodeSizeY);
   for (int y = 0; y < encodeSizeY; y++) {
     for (int x = 0; x < encodeSizeX; x++) {
@@ -17,12 +17,15 @@ void encodePNG(String path,int sizeX,int sizeY,List<int> canvas,List<int> palett
       var red = (palette[canvas[canvasY * sizeX + canvasX]] & 0x00FF0000) >> 16;
       var green = (palette[canvas[canvasY * sizeX + canvasX]] & 0x0000FF00) >> 8;
       var blue = (palette[canvas[canvasY * sizeX + canvasX]] & 0x000000FF);
+      var alpha = (palette[canvas[canvasY * sizeX + canvasX]] & 0xFF000000);
       //print("$red , $green , $blue");
-      image.setPixel(x, y, ImgLib.getColor(red, green, blue));
+      image.setPixel(x, y, ImgLib.getColor(red, green, blue,alpha));
     }
   }
   var file = File(path);
   file.writeAsBytesSync(ImgLib.encodePng(image));
+  print("encode finished");
+
 }
 
 void encodePNGBase64(String path,int sizeX,int sizeY,List<int> canvas,List<int> palette, int encodeSizeX,int encodeSizeY){

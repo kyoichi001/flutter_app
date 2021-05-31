@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_app/settingsPage.dart';
-import 'debugConsole.dart';
+import 'package:flutter_app/theme.dart';
 import 'homepage.dart';
 
 void main() {
@@ -12,38 +11,27 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({Key key}) : super(key: key);
-  //https://zenn.dev/sugitlab/articles/bef3a05963680a
-  static const MaterialColor white = MaterialColor(
-    0xFFC8CCD2,
-    <int, Color>{
-      50: Color(0xFFFCFCFF),
-      100: Color(0xFFF2F6FA),
-      200: Color(0xFFEFF2F6),
-      300: Color(0xFFDFE6EA),
-      400: Color(0xFFCACFD4),
-      500: Color(0xFFA3A7AD),
-      600: Color(0xFF85878E),
-      700: Color(0xFF75767D),
-      800: Color(0xFF5C5C61),
-      900: Color(0xFF444447),
-    },
-  );
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: MyApp.white,
+        primarySwatch: AppTheme.materialBlue,
       ),
       home: MainWiget()
     );
   }
 }
 
-class MainWiget extends StatelessWidget {
+class MainWiget extends StatefulWidget {
   const MainWiget({Key key}) : super(key: key);
+  @override
+  MainWigetState createState() => MainWigetState();
+}
 
+class MainWigetState extends State<MainWiget> {
+int _selectedIndex=0;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,23 +40,41 @@ class MainWiget extends StatelessWidget {
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.settings),
-            onPressed: () {
-              Navigator.push(
+            onPressed: () async{
+              await Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        SettingsPage(
-                        ),
+                  MaterialPageRoute<bool>(
+                    builder: (context) => SettingsPage(),
                   )
               );
+              setState(() {});
             },
           ),
         ],
       ),
-      body:
-      Center(
+      body: Center(
         child: HomePage(),
       ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: '設定',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: AppTheme.materialBlue[800],
+        onTap: _onItemTapped,
+      ),
     );
+  }
+  void _onItemTapped(int index){
+    setState(() {
+      _selectedIndex = index;
+    });
   }
 }

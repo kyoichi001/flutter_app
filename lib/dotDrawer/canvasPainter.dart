@@ -21,8 +21,11 @@ class CanvasPainter extends CustomPainter{
   @override
   void paint(Canvas canvas, Size size) {
     double rectSize = size.width / dotCanvas.sizeX;
-    normal.paint(canvas, size);
-    preview.paint(canvas, size);
+    if(!dotCanvas.isEditing){
+      normal.paint(canvas, size);
+    }else{
+      preview.paint(canvas, size);
+    }
     drawGrid(canvas,size);
   }
 

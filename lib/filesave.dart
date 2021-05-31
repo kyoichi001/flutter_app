@@ -16,6 +16,7 @@ class SaveFileInfo {
   DateTime createdAt;
 
   File loadPreview() {
+    print("load preview : "+thumbnailPath);
     var file = File(thumbnailPath);
     if (!file.existsSync()) {
       print("file not exist. Create new thumbnail");
@@ -74,6 +75,8 @@ class FileSave{
   }
 
   static Future<void> save(SaveFileInfo info,String filename) async{
+    final directory = await getTemporaryDirectory();
+    info.thumbnailPath =directory.path + '/'+ setExtension(filename, ".png");
     Map<String,dynamic> json=<String, dynamic>{
       "filename":filename,
       "format": "0.0.1",
@@ -81,10 +84,18 @@ class FileSave{
       "sizeY": info.sizeY,
       "canvas": info.canvasData,
       "palette": info.palleteData,
+      "thumbnailPath":info.thumbnailPath,
     };
     var jsonText = jsonEncode(json);
-    print("save file"+filename);
-    final directory = await getTemporaryDirectory();
+    print("save file : "+filename);
+    encodePNG(
+        info.thumbnailPath,
+        info.sizeX,
+        info.sizeY,
+        info.canvasData,
+        info.palleteData,
+        128,
+        128);
     File(directory.path + '/' + filename).writeAsString(jsonText);
   }
 

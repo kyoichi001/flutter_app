@@ -199,7 +199,7 @@ class _MainEditorWidgetState extends State<MainEditorWidget> {
     });
   }
 
-  void onOptionSelected(FileOption option) {
+  void onOptionSelected(FileOption option) async {
     if (option == FileOption.save) {
       widget.onSave();
     } else if (option == FileOption.load) {//画像からよみこみ
@@ -210,8 +210,8 @@ class _MainEditorWidgetState extends State<MainEditorWidget> {
     } else if (option == FileOption.export) {
       widget.onExport();
     } else if (option == FileOption.close) {
-      widget.onSave();
-      Navigator.pop(context);
+      await widget.onSave();
+      Navigator.pop(context,true);
     }
   }
 

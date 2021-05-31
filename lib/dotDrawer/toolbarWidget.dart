@@ -145,30 +145,35 @@ class CanvasOptionWidget extends StatelessWidget {
             value: CanvasOption.flipX,
             child: ListTile(
                 leading:Icon(Icons.vertical_split),
+                title:Text("左右反転")
             ),
           ),
           const PopupMenuItem<CanvasOption>(
             value: CanvasOption.flipY,
             child: ListTile(
                 leading:Icon(Icons.horizontal_split),
+                title:Text("上下反転")
             ),
           ),
           const PopupMenuItem<CanvasOption>(
             value: CanvasOption.rotateL,
             child: ListTile(
                 leading:Icon(Icons.rotate_left),
+                title:Text("右に90度回転")
             ),
           ),
           const PopupMenuItem<CanvasOption>(
             value: CanvasOption.rotateL,
             child: ListTile(
                 leading:Icon(Icons.rotate_right),
+                title:Text("右に90度回転")
             ),
           ),
           const PopupMenuItem<CanvasOption>(
-            value: CanvasOption.rotateL,
+            value: CanvasOption.move,
             child: ListTile(
                 leading:Icon(Icons.touch_app_sharp),
+                title:Text("キャンバス移動")
             ),
           ),
         ],
@@ -191,13 +196,13 @@ class OptionWidget extends StatelessWidget {
         icon:Icon(Icons.save),
         itemBuilder: (BuildContext context) =>
         <PopupMenuEntry<FileOption>>[
-          const PopupMenuItem<FileOption>(
+         /* const PopupMenuItem<FileOption>(
             value: FileOption.save,
             child: ListTile(
                 leading:Icon(Icons.save),
                 title:Text("save")
             ),
-          ),
+          ),*/
           /*const PopupMenuItem<FileOption>(
             value: FileOption.load,
             child: ListTile(
@@ -223,7 +228,7 @@ class OptionWidget extends StatelessWidget {
             value: FileOption.close,
             child: ListTile(
                 leading:Icon(Icons.close),
-                title:Text("close")
+                title:Text("保存して終了")
             ),
           ),
         ],

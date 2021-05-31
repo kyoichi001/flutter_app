@@ -11,35 +11,30 @@ enum WorkOption{rename,export, delete}
 class WorkWidget extends StatelessWidget {
 
   final SaveFileInfo info;
-  Function(SaveFileInfo) onSelected;
-  Function(WorkOption) onOptionSelected;
+  final Function(SaveFileInfo) onSelected;
+  final Function(WorkOption) onOptionSelected;
 
   WorkWidget({Key key, this.info, this.onSelected,this.onOptionSelected}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    var w=MediaQuery.of(context).size.width/2-10;
     return Container(
-      width:w,
-      height:w+40,
       alignment: Alignment.center,
       padding: EdgeInsets.all(0),
-      decoration: BoxDecoration(
+     /* decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
           new BoxShadow(
             color: Colors.grey,
             offset: new Offset(0.0, 5.0),
-            blurRadius: 10.0,
+            blurRadius: 1.0,
           )
         ],
-      ),
+      ),*/
       child: Column(
         children: [
           Expanded(
             child:FlatButton(
-              minWidth: w,
-              height: w,
               padding: EdgeInsets.all(0),
               onPressed: () {
                 onSelected(info);
@@ -49,7 +44,6 @@ class WorkWidget extends StatelessWidget {
                 padding: EdgeInsets.all(0),
                 width: double.infinity,
                 height: double.infinity,
-                color:Colors.white,
                 child: Image.file(
                   info.loadPreview(),
                   fit: BoxFit.contain,
@@ -61,6 +55,7 @@ class WorkWidget extends StatelessWidget {
             children: [
               Expanded(
                 child: Column(
+                  crossAxisAlignment:CrossAxisAlignment.start,
                   children: [
                     Text(info.filename),
                     Text(info.sizeX.toString() + "x" + info.sizeY.toString())
@@ -72,7 +67,7 @@ class WorkWidget extends StatelessWidget {
                 onSelected: onOptionSelected,
                 itemBuilder: (BuildContext context) =>
                 <PopupMenuEntry<WorkOption>>[
-                  const PopupMenuItem<WorkOption>(
+                  /*const PopupMenuItem<WorkOption>(
                     value: WorkOption.rename,
                     child: ListTile(
                         leading: Icon(Icons.edit),
@@ -85,7 +80,7 @@ class WorkWidget extends StatelessWidget {
                         leading: Icon(Icons.save),
                         title: Text("export")
                     ),
-                  ),
+                  ),*/
                   const PopupMenuItem<WorkOption>(
                     value: WorkOption.delete,
                     child: ListTile(
