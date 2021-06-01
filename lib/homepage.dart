@@ -1,6 +1,7 @@
-
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/filesave.dart';
+import 'package:path/path.dart' as Path;
 import 'workWIdget.dart';
 import 'dotDrawer/editorPage.dart';
 
@@ -68,7 +69,7 @@ class _MyHomePageState extends State<HomePage> {
       ),
     );
   }
-  
+  String inputFileName="";
   Widget getWorkWidget(SaveFileInfo info) {
     return WorkWidget(
         info: info,
@@ -84,7 +85,7 @@ class _MyHomePageState extends State<HomePage> {
               builder: (_) {
                 return AlertDialog(
                   title: const Text("確認"),
-                  content:const  Text("削除しますか？"),
+                  content: const Text("削除しますか？"),
                   actions: <Widget>[
                     // ボタン領域
                     TextButton(
@@ -110,7 +111,53 @@ class _MyHomePageState extends State<HomePage> {
               },
             );
           } else if (option == WorkOption.rename) {
+            inputFileName = info.filename;
 
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              // dialog is dismissible with a tap on the barrier
+              builder: (BuildContext context) =>
+              new AlertDialog(
+                title: new Text(info.filename),
+                content: new Row(
+                  children: <Widget>[
+                    new Expanded(
+                        child: new TextField(
+                          autofocus: true,
+                          decoration: new InputDecoration(
+                              labelText: 'Title',
+                              hintText: inputFileName
+                          ),
+                          onChanged: (value) async {
+                            inputFileName = value;
+                          },
+                        )),
+                  ],
+                ),
+                // ボタンの配置
+                actions: <Widget>[
+                  TextButton(
+                      child: const Text('キャンセル'),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      }),
+                  TextButton(
+                      child: const Text('OK'),
+                      onPressed: () async {
+                        Navigator.pop(context);
+                        await FileSave.delete(info.filename);
+                        await FileSave.delete(
+                            Path.setExtension(info.filename, ".png"));
+                        if(File(info.filename).existsSync()){//すでにある場合
+                          inputFileName+="X";
+                        }
+                        await FileSave.save(info, inputFileName);
+                        setState(() {});
+                      })
+                ],
+              ),
+            );
           }
         }
     );

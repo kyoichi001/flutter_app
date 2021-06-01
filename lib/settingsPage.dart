@@ -3,53 +3,36 @@ import 'package:flutter/material.dart';
 
 import 'filesave.dart';
 
-class SettingsPage extends StatefulWidget {
-  SettingsPage({Key key}) : super(key: key);
-  @override
-  _SettingsPageState createState() => _SettingsPageState();
+class AppSettings{
+  bool nightMode=false;
 }
 
-class _SettingsPageState extends State<SettingsPage> {
-
-  bool nightMode=false;
-
+class SettingsPage extends StatelessWidget {
+  SettingsPage({Key key,this.settings}) : super(key: key);
+  AppSettings settings;
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: const Text('Settings'),
+    return Column(
+      children: [
+        TextButton(
+            onPressed:()async {
+              await FileSave.clearData();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text('clear all data',textAlign: TextAlign.left,),
+                ),
+              );
+            } ,
+            child: Text("delete all files")
         ),
-        body:Column(
-          children: [
-            TextButton(
-                onPressed:clearData ,
-                child: Text("delete all files")
-            ),
-            /*SwitchListTile(
+        SwitchListTile(
               title: const Text('Lights'),
-              value: nightMode,
+              value: settings.nightMode,
               onChanged: (bool value) {
-                setState(() {
-                  nightMode = value;
-                });
+                settings.nightMode=value;
               },
-            )*/
-          ],
-        )
-    );
-  }
-
-  void clearData() {
-    FileSave.clearData().then(
-            (void e) {
-          setState(() {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Text('clear all data'),
-              ),
-            );
-          });
-        }
+            )
+      ],
     );
   }
 

@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter_app/theme.dart';
 
 class ToolsID {
   static const int pen = 0;
@@ -22,8 +23,8 @@ class ToolsID {
 }
 
 class ToolButton extends StatelessWidget {
-  Function onPressed;
-  IconData icon;
+  final Function onPressed;
+  final IconData icon;
 
   ToolButton({Key key, this.onPressed, this.icon})
       : super(key: key);
@@ -34,8 +35,7 @@ class ToolButton extends StatelessWidget {
         width: 50,
         child: AspectRatio(
           aspectRatio: 1 / 1,
-          child:
-          ElevatedButton(
+          child: ElevatedButton(
             onPressed: onPressed,
             child: Icon(icon),
           ),
@@ -45,14 +45,14 @@ class ToolButton extends StatelessWidget {
 }
 
 class ToolsWidget extends StatelessWidget {
-  Function(int) onPressed;
-  Function(CanvasOption) onCanvasOptionPressed;
-  Function(FileOption) onFileOptionSelect;
-  bool undoEnable = false;
-  bool redoEnable = false;
+  final Function(int) onPressed;
+  final  Function(CanvasOption) onCanvasOptionPressed;
+  final  Function(FileOption) onFileOptionSelect;
+  final  bool undoEnable ;
+  final bool redoEnable ;
 
   ToolsWidget(
-      {Key key, this.onPressed, this.onCanvasOptionPressed, this.onFileOptionSelect})
+      {Key key, this.onPressed, this.onCanvasOptionPressed, this.onFileOptionSelect,this.undoEnable,this.redoEnable})
       : super(key: key);
 
   @override
@@ -127,7 +127,7 @@ class ToolsWidget extends StatelessWidget {
 enum CanvasOption{ flipX, flipY, rotateL,rotateR,move}
 
 class CanvasOptionWidget extends StatelessWidget {
-  Function(CanvasOption) onSelect;
+  final Function(CanvasOption) onSelect;
   CanvasOptionWidget({Key key, this.onSelect}) : super(key: key);
 
   @override
@@ -136,7 +136,7 @@ class CanvasOptionWidget extends StatelessWidget {
       PopupMenuButton<CanvasOption>
         (
         onSelected: onSelect,
-        icon:ElevatedButton(
+        icon:const ElevatedButton(
           child: Icon(Icons.now_wallpaper)
         ),
         itemBuilder: (BuildContext context) =>
@@ -185,7 +185,7 @@ class CanvasOptionWidget extends StatelessWidget {
 enum FileOption{ save, load, editPalette,export,close}
 
 class OptionWidget extends StatelessWidget {
-  Function(FileOption) onSelect;
+  final Function(FileOption) onSelect;
   OptionWidget({Key key, this.onSelect}) : super(key: key);
 
   @override
@@ -209,15 +209,15 @@ class OptionWidget extends StatelessWidget {
                 leading:Icon(Icons.file_download),
                 title:Text("load")
             ),
-          ),
+          ),*/
           const PopupMenuItem<FileOption>(
             value: FileOption.editPalette,
             child: ListTile(
                 leading:Icon(Icons.palette),
-                title:Text("edit palette")
+                title:Text("パレットを編集する")
             ),
           ),
-          const PopupMenuItem<FileOption>(
+          /*const PopupMenuItem<FileOption>(
             value: FileOption.export,
             child: ListTile(
                 leading:Icon(Icons.outbox),

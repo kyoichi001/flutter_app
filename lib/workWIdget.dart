@@ -21,16 +21,6 @@ class WorkWidget extends StatelessWidget {
     return Container(
       alignment: Alignment.center,
       padding: EdgeInsets.all(0),
-     /* decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          new BoxShadow(
-            color: Colors.grey,
-            offset: new Offset(0.0, 5.0),
-            blurRadius: 1.0,
-          )
-        ],
-      ),*/
       child: Column(
         children: [
           Expanded(
@@ -67,14 +57,14 @@ class WorkWidget extends StatelessWidget {
                 onSelected: onOptionSelected,
                 itemBuilder: (BuildContext context) =>
                 <PopupMenuEntry<WorkOption>>[
-                  /*const PopupMenuItem<WorkOption>(
+                  const PopupMenuItem<WorkOption>(
                     value: WorkOption.rename,
                     child: ListTile(
                         leading: Icon(Icons.edit),
                         title: Text("rename")
                     ),
                   ),
-                  const PopupMenuItem<WorkOption>(
+                  /*const PopupMenuItem<WorkOption>(
                     value: WorkOption.export,
                     child: ListTile(
                         leading: Icon(Icons.save),
@@ -98,6 +88,17 @@ class WorkWidget extends StatelessWidget {
     );
   }
 }
+
+/* decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          new BoxShadow(
+            color: Colors.grey,
+            offset: new Offset(0.0, 5.0),
+            blurRadius: 1.0,
+          )
+        ],
+      ),*/
 
 /*
 *  Column(

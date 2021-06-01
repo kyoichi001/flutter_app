@@ -2,7 +2,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/dotDrawer/palette.dart';
-import 'package:flutter_app/dotDrawer/paletteEditor.dart';
+import 'package:flutter_app/dotDrawer/paletteEditorPage.dart';
 import 'package:flutter_app/dotDrawer/toolbarWidget.dart';
 
 import 'brush/basebrush.dart';
@@ -47,9 +47,9 @@ class _MainEditorWidgetState extends State<MainEditorWidget> {
       onPressed: this._changeTools,
       onCanvasOptionPressed: this.onCanvasOptionSelected,
       onFileOptionSelect: this.onOptionSelected,
+        undoEnable: history.canUndo(),
+      redoEnable:history.canRedo(),
     );
-    tools.redoEnable = history.canRedo();
-    tools.undoEnable = history.canUndo();
 
     return Scaffold(
         body: Stack(
@@ -74,7 +74,7 @@ class _MainEditorWidgetState extends State<MainEditorWidget> {
                         padding: EdgeInsets.all(5),
                         child:PaletteWidget(
                           onButtonPressed: this._changeColor,
-                          onEditorOpen: this.openPaletteEditor,
+                          //onEditorOpen: this.openPaletteEditor,
                           palette: widget.palette,
                         ),
                       ),
@@ -144,7 +144,7 @@ class _MainEditorWidgetState extends State<MainEditorWidget> {
         MaterialPageRoute(
           builder: (context) =>
           (
-              PaletteEditor(canvas: widget.dotCanvas, palette: widget.palette,)
+              PaletteEditorPage(canvas: widget.dotCanvas, palette: widget.palette,)
           ),
         )
     );

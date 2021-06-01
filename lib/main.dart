@@ -15,11 +15,14 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: AppTheme.materialBlue,
-      ),
-      home: MainWiget()
+        title: 'cat pixel',
+        theme: ThemeData(
+          primaryColor: Color(0xff11518c),
+          accentColor:Color(0xff80DFDA),
+          primarySwatch: AppTheme.appPrimary,
+        ),
+        darkTheme: ThemeData.dark(),
+        home: MainWiget()
     );
   }
 }
@@ -31,29 +34,22 @@ class MainWiget extends StatefulWidget {
 }
 
 class MainWigetState extends State<MainWiget> {
-int _selectedIndex=0;
+  AppSettings settings=AppSettings();
+  int _selectedIndex=0;
+
   @override
   Widget build(BuildContext context) {
+    List<Widget> _widgetOptions = <Widget>[
+      HomePage(),
+      SettingsPage(settings: settings,)
+    ];
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Pixel Editor'),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.settings),
-            onPressed: () async{
-              await Navigator.push(
-                  context,
-                  MaterialPageRoute<bool>(
-                    builder: (context) => SettingsPage(),
-                  )
-              );
-              setState(() {});
-            },
-          ),
-        ],
+        title: const Text('cat pixel'),
       ),
       body: Center(
-        child: HomePage(),
+        child: _widgetOptions.elementAt(_selectedIndex),
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
@@ -67,7 +63,7 @@ int _selectedIndex=0;
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: AppTheme.materialBlue[800],
+        selectedItemColor: AppTheme.appSecondary[700],
         onTap: _onItemTapped,
       ),
     );

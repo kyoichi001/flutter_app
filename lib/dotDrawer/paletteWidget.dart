@@ -5,11 +5,10 @@ import 'package:flutter_app/dotDrawer/palette.dart';
 
 class PaletteWidget extends StatelessWidget {
   Function(int) onButtonPressed;
-  Function onEditorOpen;
   ColorPalette palette;
 
   PaletteWidget(
-      {Key key, this.onButtonPressed, this.onEditorOpen, this.palette})
+      {Key key, this.onButtonPressed, this.palette})
       : super(key: key);
 
   @override
@@ -59,7 +58,7 @@ class PaletteWidget extends StatelessWidget {
       );
   }
 
-  Widget openEditorButton() {
+  /*Widget openEditorButton() {
     return Expanded(child: Container(
       width: 30,
       height: 40,
@@ -75,7 +74,7 @@ class PaletteWidget extends StatelessWidget {
       ),
     ),
     );
-  }
+  }*/
 
 }
 
