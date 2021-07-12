@@ -106,6 +106,19 @@ class FileSave{
       await files[i].delete();
       print("deleted: "+files[i].path);
     }
+
+  }
+
+  static Future<void> duplicate(SaveFileInfo info)async{
+    SaveFileInfo infos=SaveFileInfo();
+    infos.filename=info.filename.split('.')[0]+"_copy.json";
+    infos.palleteData=info.palleteData;
+    infos.canvasData=info.canvasData;
+    infos.createdAt=info.createdAt;
+    infos.sizeX=info.sizeX;
+    infos.sizeY=info.sizeY;
+    infos.thumbnailPath=info.thumbnailPath.split('.')[0]+"_copy.png";
+    await save( infos,infos.filename);
   }
 
   static Future<void> delete(String filename) async{

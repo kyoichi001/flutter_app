@@ -6,7 +6,8 @@ import 'workWIdget.dart';
 import 'dotDrawer/editorPage.dart';
 
 class HomePage extends StatefulWidget {
-  HomePage({Key key}) : super(key: key);
+  int worksAxisCount;
+  HomePage({Key key,this.worksAxisCount}) : super(key: key);
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
@@ -45,7 +46,7 @@ class _MyHomePageState extends State<HomePage> {
               return GridView.builder(
                   itemCount: list.length,
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
+                    crossAxisCount: widget.worksAxisCount,
                   ),
                   itemBuilder: (BuildContext context, int index) {
                     return list[index];
@@ -78,7 +79,28 @@ class _MyHomePageState extends State<HomePage> {
         },
         onOptionSelected: (var option) {
           if (option == WorkOption.export) {
-
+            showDialog(
+                context: context,
+                builder: (_) {
+                  return AlertDialog(
+                    title: const Text("確認"),
+                    content: const Text("pngに出力します"),
+                    actions: <Widget>[
+                      // ボタン領域
+                      TextButton(
+                        child: const Text("Cancel"),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                      TextButton(
+                        child: const Text("OK"),
+                        onPressed: () async {
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ],
+                  );
+                }
+            );
           } else if (option == WorkOption.delete) {
             showDialog(
               context: context,
@@ -110,7 +132,18 @@ class _MyHomePageState extends State<HomePage> {
                 );
               },
             );
-          } else if (option == WorkOption.rename) {
+          } else if (option == WorkOption.duplicate) {
+            FileSave.duplicate(info).then((_) {
+              setState(() {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: const Text('data duplicated'),
+                  ),
+                );
+              });
+            });
+          }
+          else if (option == WorkOption.rename) {
             inputFileName = info.filename;
 
             showDialog(
@@ -149,8 +182,8 @@ class _MyHomePageState extends State<HomePage> {
                         await FileSave.delete(info.filename);
                         await FileSave.delete(
                             Path.setExtension(info.filename, ".png"));
-                        if(File(info.filename).existsSync()){//すでにある場合
-                          inputFileName+="X";
+                        if (File(info.filename).existsSync()) { //すでにある場合
+                          inputFileName += "_cp";
                         }
                         await FileSave.save(info, inputFileName);
                         setState(() {});

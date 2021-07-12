@@ -2,8 +2,8 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_app/dotDrawer/dotcanvas.dart';
-import 'package:flutter_app/dotDrawer/palette.dart';
+import 'package:flutter_app/dotDrawer/canvas/dotcanvas.dart';
+import 'package:flutter_app/dotDrawer/palette/palette.dart';
 
 class MirrorX{
   DotCanvas canvas;

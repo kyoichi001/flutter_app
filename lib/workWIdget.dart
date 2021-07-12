@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 
 import 'filesave.dart';
 
-enum WorkOption{rename,export, delete}
+enum WorkOption{rename,export, delete,duplicate}
 
 class WorkWidget extends StatelessWidget {
 
@@ -58,24 +58,34 @@ class WorkWidget extends StatelessWidget {
                 itemBuilder: (BuildContext context) =>
                 <PopupMenuEntry<WorkOption>>[
                   const PopupMenuItem<WorkOption>(
+                    value: WorkOption.duplicate,
+                    child: ListTile(
+                        leading: Icon(Icons.copy),
+                        title: Text("複製")
+                    ),
+                  ),
+                  const PopupMenuItem<WorkOption>(
                     value: WorkOption.rename,
                     child: ListTile(
                         leading: Icon(Icons.edit),
-                        title: Text("rename")
+                        title: Text("名前変更")
                     ),
                   ),
-                  /*const PopupMenuItem<WorkOption>(
+                  const PopupMenuItem<WorkOption>(
                     value: WorkOption.export,
                     child: ListTile(
                         leading: Icon(Icons.save),
-                        title: Text("export")
+                        title: Text("エクスポート")
                     ),
-                  ),*/
+                  ),
                   const PopupMenuItem<WorkOption>(
                     value: WorkOption.delete,
                     child: ListTile(
                         leading: Icon(Icons.delete),
-                        title: Text("delete")
+                        title: Text(
+                          "削除",
+                          style: TextStyle(color:Colors.red),
+                        )
                     ),
                   ),
                 ],

@@ -1,121 +1,101 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter_app/dotDrawer/tools.dart';
 import 'package:flutter_app/theme.dart';
 
-class ToolsID {
-  static const int pen = 0;
-  static const int bucket = 1;
-  static const int rect = 2;
-  static const int circle = 3;
-  static const int undo = 4;
-  static const int redo = 5;
-
-  static const int canvas=2000;
-  static const int reverseX=6;
-  static const int reverseY=7;
-  static const int move=8;
-  static const int rotateL=200;
-  static const int rotateR=201;
-
-  static const int clear=9;
-  static const int spoit=10;
-  static const int line=11;
-}
-
-class ToolButton extends StatelessWidget {
-  final Function onPressed;
-  final IconData icon;
-
-  ToolButton({Key key, this.onPressed, this.icon})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-        width: 50,
-        child: AspectRatio(
-          aspectRatio: 1 / 1,
-          child: ElevatedButton(
-            onPressed: onPressed,
-            child: Icon(icon),
-          ),
-        )
-    );
-  }
-}
+import 'ToolButton.dart';
 
 class ToolsWidget extends StatelessWidget {
-  final Function(int) onPressed;
-  final  Function(CanvasOption) onCanvasOptionPressed;
-  final  Function(FileOption) onFileOptionSelect;
-  final  bool undoEnable ;
-  final bool redoEnable ;
+  final Function(ToolID) onPressed;
+  final Function(CanvasOption) onCanvasOptionPressed;
+  final Function(FileOption) onFileOptionSelect;
+  final bool undoEnable;
+
+  final bool redoEnable;
+
+  final ToolID selectedTool;
 
   ToolsWidget(
-      {Key key, this.onPressed, this.onCanvasOptionPressed, this.onFileOptionSelect,this.undoEnable,this.redoEnable})
+      {Key key, this.onPressed, this.onCanvasOptionPressed, this.onFileOptionSelect, this.undoEnable, this.redoEnable, this.selectedTool})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Wrap(
-      direction:Axis.horizontal,
+      direction: Axis.horizontal,
       children: [
         ToolButton(
-            onPressed:  () {
-              onPressed(ToolsID.pen);
-            },
-            icon:Icons.brush
+          onPressed: () {
+            onPressed(ToolID.pen);
+          },
+          icon: Icons.brush,
+          isSelected: selectedTool == ToolID.pen,
         ),
         ToolButton(
-            onPressed:  () {
-              onPressed(ToolsID.bucket);
-            },
-            icon:Icons.format_color_fill
+          onPressed: () {
+            onPressed(ToolID.bucket);
+          },
+          icon: Icons.format_color_fill,
+          isSelected: selectedTool == ToolID.bucket,
         ),
         ToolButton(
-            onPressed:  () {
-              onPressed(ToolsID.rect);
-            },
-            icon:Icons.crop_square
+          onPressed: () {
+            onPressed(ToolID.rect);
+          },
+          icon: Icons.crop_square,
+          isSelected: selectedTool == ToolID.rect,
         ),
         ToolButton(
-            onPressed:  () {
-              onPressed(ToolsID.circle);
-            },
-            icon:Icons.circle
+          onPressed: () {
+            onPressed(ToolID.line);
+          },
+          icon: Icons.horizontal_rule_outlined,
+          isSelected: selectedTool == ToolID.line,
         ),
         ToolButton(
-            onPressed:  () {
-              onPressed(ToolsID.line);
-            },
-            icon:Icons.horizontal_rule_outlined
+          onPressed: () {
+            onPressed(ToolID.circle);
+          },
+          icon: Icons.circle,
+          isSelected: selectedTool == ToolID.circle,
         ),
         ToolButton(
-            onPressed:  () {
-              onPressed(ToolsID.clear);
-            },
-            icon:Icons.clear
+          onPressed: () {
+            onPressed(ToolID.clear);
+          },
+          icon: Icons.clear,
+          isSelected: false,
         ),
         ToolButton(
-            onPressed:  () {
-              onPressed(ToolsID.spoit);
-            },
-            icon:Icons.touch_app
+          onPressed: () {
+            onPressed(ToolID.spoit);
+          },
+          icon: Icons.touch_app,
+          isSelected: selectedTool==ToolID.spoit,
         ),
         CanvasOptionWidget(
           onSelect: onCanvasOptionPressed,
         ),
         ToolButton(
-            onPressed: !undoEnable ? null : () {
-              onPressed(ToolsID.undo);
-            },
-            icon:Icons.undo
+          onPressed: !undoEnable ? null : () {
+            onPressed(ToolID.undo);
+          },
+          icon: Icons.undo,
+          isSelected: false,
         ),
         ToolButton(
-            onPressed: !redoEnable ? null : () {
-              onPressed(ToolsID.redo);
-            },
-            icon:Icons.redo
+          onPressed: !redoEnable ? null : () {
+            onPressed(ToolID.redo);
+          },
+          icon: Icons.redo,
+          isSelected: false,
+        ),
+        ToolButton(
+          onPressed: () {
+            onPressed(ToolID.move);
+          },
+          icon: Icons.touch_app_sharp,
+          isSelected: selectedTool == ToolID.move,
         ),
         OptionWidget(onSelect: onFileOptionSelect,)
       ],
@@ -169,13 +149,13 @@ class CanvasOptionWidget extends StatelessWidget {
                 title:Text("右に90度回転")
             ),
           ),
-          const PopupMenuItem<CanvasOption>(
+         /* const PopupMenuItem<CanvasOption>(
             value: CanvasOption.move,
             child: ListTile(
                 leading:Icon(Icons.touch_app_sharp),
                 title:Text("キャンバス移動")
             ),
-          ),
+          ),*/
         ],
       );
   }
@@ -233,5 +213,39 @@ class OptionWidget extends StatelessWidget {
           ),
         ],
       );
+  }
+}
+
+
+enum SelectionOption{rect,magicWand}
+class SelectionWidget extends StatelessWidget {
+
+  final Function(SelectionOption) onSelect;
+  SelectionWidget({Key key, this.onSelect}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return PopupMenuButton<SelectionOption>
+      (
+      onSelected: onSelect,
+      icon:Icon(Icons.select_all_rounded),
+      itemBuilder: (BuildContext context) =>
+      <PopupMenuEntry<SelectionOption>>[
+        const PopupMenuItem<SelectionOption>(
+          value: SelectionOption.rect,
+          child: ListTile(
+              leading:Icon(Icons.select_all_rounded),
+              title:Text("矩形選択")
+          ),
+        ),
+        const PopupMenuItem<SelectionOption>(
+          value: SelectionOption.magicWand,
+          child: ListTile(
+              leading:Icon(Icons.star),
+              title:Text("マジックワンド")
+          ),
+        ),
+      ],
+    );
   }
 }

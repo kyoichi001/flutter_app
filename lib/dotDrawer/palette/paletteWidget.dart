@@ -1,14 +1,13 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_app/dotDrawer/palette.dart';
+import 'package:flutter_app/dotDrawer/palette/palette.dart';
 
 class PaletteWidget extends StatelessWidget {
   Function(int) onButtonPressed;
   ColorPalette palette;
 
-  PaletteWidget(
-      {Key key, this.onButtonPressed, this.palette})
+  PaletteWidget({Key key, this.onButtonPressed, this.palette})
       : super(key: key);
 
   @override
@@ -37,64 +36,29 @@ class PaletteWidget extends StatelessWidget {
         child: Container(
             width: 30,
             height: 40,
+            decoration: palette.isIndexSelected(id) ? BoxDecoration(
+              border: Border.all(color: Color(0xFFFFADC7), width: 4.0),
+            ) : null,
             child: Stack(
               children: [
                 Positioned.fill(
-                  child:Image.asset(
-                      "images/transparent.png",
+                  child: Image.asset(
+                    "images/transparent.png",
                     repeat: ImageRepeat.repeat,
                   ),
                 ),
-                FlatButton(
-                  padding: EdgeInsets.all(0),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.all(0),
+                    primary: palette.cols[id],
+                  ),
                   onPressed: () {
                     onButtonPressed(id);
                   },
-                  color: palette.cols[id],
                 ),
               ],
             )
         ),
       );
   }
-
-  /*Widget openEditorButton() {
-    return Expanded(child: Container(
-      width: 30,
-      height: 40,
-      child: FlatButton(
-          padding: EdgeInsets.all(0),
-          onPressed: () {
-            onEditorOpen();
-          },
-          child: Icon(
-            Icons.edit,
-            size: 20,
-          )
-      ),
-    ),
-    );
-  }*/
-
 }
-
-
-/*
-IconButton(
-padding: EdgeInsets.all(0),
-iconSize: 20.0,
-onPressed: () {
-onButtonPressed(id);
-},
-color: palette.cols[id],
-icon: Icon(Icons.circle)
-);
-
-
-    IconButton(
-        padding: EdgeInsets.all(0),
-        iconSize: 20.0,
-        icon: Icon(Icons.edit),
-        onPressed: onEditorOpen
-    );
-*/

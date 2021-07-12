@@ -48,4 +48,15 @@ class ColorPalette{
     return res;
   }
 
+  List<bool> isSelected(){
+    List<bool> res=[];
+    for(int i=0;i<cols.length;i++){
+      res.add(i==currentColor);
+    }
+    return res;
+  }
+
+  bool isIndexSelected(int index){
+    return index==currentColor;
+  }
 }

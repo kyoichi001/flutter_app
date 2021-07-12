@@ -2,8 +2,8 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter_app/dotDrawer/brush/basebrush.dart';
-import 'package:flutter_app/dotDrawer/dotcanvas.dart';
-import 'package:flutter_app/dotDrawer/palette.dart';
+import 'package:flutter_app/dotDrawer/canvas/dotcanvas.dart';
+import 'package:flutter_app/dotDrawer/palette/palette.dart';
 
 //https://en.wikipedia.org/wiki/Midpoint_circle_algorithm
 
@@ -19,6 +19,20 @@ class CircleBrush extends BaseBrush {
     var lb = Cell(min(start.x, end.x), min(start.y, end.y));
     var rt = Cell(max(start.x, end.x) + 1, max(start.y, end.y) + 1);
 
+    if (lb.x == rt.x) {
+      for (int y = lb.y; y <= rt.y; y++) {
+        canvas.setID(lb.x, y, palette.currentColor);
+      }
+      return;
+    }
+
+    if (lb.y == rt.y) {
+      for (int x = lb.x; x <= rt.x; x++) {
+        canvas.setID(x, lb.y, palette.currentColor);
+      }
+      return;
+    }
+
     var center = Offset((lb.x + rt.x) / 2, (lb.y + rt.y) / 2);
     double xr = (rt.x - center.dx).abs();
     double yr = (rt.y - center.dy).abs();
@@ -31,12 +45,19 @@ class CircleBrush extends BaseBrush {
       canvas.setID(x + xCenter, -y + yCenter, palette.currentColor);
       canvas.setID(-x + xCenter, y + yCenter, palette.currentColor);
       canvas.setID(-x + xCenter, -y + yCenter, palette.currentColor);
-      canvas.setID(y + xCenter, x + yCenter, palette.currentColor);
-      canvas.setID(y + xCenter, -x + yCenter, palette.currentColor);
-      canvas.setID(-y + xCenter, x + yCenter, palette.currentColor);
-      canvas.setID(-y + xCenter, -x + yCenter, palette.currentColor);
-      if (RE(x - 1, y + 1, xr,yr) < RE(x, y + 1, xr,yr)) {
+      if (RE(x - 1, y + 1, xr, yr) < RE(x, y + 1, xr, yr)) {
         x -= 1;
+      }
+    }
+    int y = yr.floor();
+    int x0 = 0;
+    for (int x = x0; x <= y; x++) {
+      canvas.setID(x + xCenter, y + yCenter, palette.currentColor);
+      canvas.setID(x + xCenter, -y + yCenter, palette.currentColor);
+      canvas.setID(-x + xCenter, y + yCenter, palette.currentColor);
+      canvas.setID(-x + xCenter, -y + yCenter, palette.currentColor);
+      if (RE(x + 1, y - 1, xr, yr) < RE(x + 1, y, xr, yr)) {
+        y -= 1;
       }
     }
   }

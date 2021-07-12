@@ -1,17 +1,18 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_app/dotDrawer/palette.dart';
-import 'package:flutter_app/dotDrawer/paletteEditorPage.dart';
+import 'package:flutter_app/dotDrawer/palette/palette.dart';
+import 'package:flutter_app/dotDrawer/palette/paletteEditorPage.dart';
 import 'package:flutter_app/dotDrawer/toolbarWidget.dart';
+import 'package:flutter_app/dotDrawer/tools.dart';
 
 import 'brush/basebrush.dart';
 import 'brush/brushFactory.dart';
 import 'brush/paint.dart';
-import 'canvasHistory.dart';
-import 'canvasPainter.dart';
-import 'paletteWidget.dart';
-import 'dotcanvas.dart';
+import 'canvas/canvasHistory.dart';
+import 'canvas/canvasPainter.dart';
+import 'palette/paletteWidget.dart';
+import 'canvas/dotcanvas.dart';
 
 GlobalKey globalKey = GlobalKey();
 
@@ -29,88 +30,103 @@ class MainEditorWidget extends StatefulWidget {
 class _MainEditorWidgetState extends State<MainEditorWidget> {
   var containerKey = GlobalKey();
   Cell currentCell;
-  BaseBrush brush;
   CanvasHistory history;
   ToolsWidget tools;
+  CanvasTools canvasTools;
 
   @override
   void initState() {
     super.initState();
-    brush = PaintBrush(widget.dotCanvas, widget.palette);
     history = CanvasHistory(widget.dotCanvas.sizeX, widget.dotCanvas.sizeY);
-    addHistory();//初期状態を記録
+    addHistory(); //初期状態を記録
+    canvasTools = CanvasTools(undo, redo,widget.dotCanvas,widget.palette,history);
   }
 
   @override
   Widget build(BuildContext context) {
     tools = ToolsWidget(
-      onPressed: this._changeTools,
+      onPressed: (ToolID id) {
+        setState(() {
+          canvasTools.set( id);
+        });
+      },
       onCanvasOptionPressed: this.onCanvasOptionSelected,
       onFileOptionSelect: this.onOptionSelected,
-        undoEnable: history.canUndo(),
-      redoEnable:history.canRedo(),
+      undoEnable: history.canUndo(),
+      redoEnable: history.canRedo(),
+      selectedTool: canvasTools.currentTool,
     );
 
-    return Scaffold(
-        body: Stack(
-            children: <Widget>[
-              Center(
-                child: Container(
-                  width: 500,
-                  child: Column(
-                    children: [
-                      Stack(
+    return WillPopScope(
+        onWillPop: () async {
+          widget.onSave();
+          return Future.value(true);
+        },
+        child: Scaffold(
+            body: Stack(
+                children: <Widget>[
+                  Center(
+                    child: Container(
+                      margin: EdgeInsets.fromLTRB(3, 50, 3, 3),
+                      padding: EdgeInsets.all(0),
+                      child: Column(
                         children: [
-                          Positioned.fill(
-                            child:Image.asset(
-                              "images/transparent.png",
-                              repeat: ImageRepeat.repeat,
+                          Stack(
+                            children: [
+                              Positioned.fill(
+                                child: Image.asset(
+                                  "images/transparent.png",
+                                  repeat: ImageRepeat.repeat,
+                                ),
+                              ),
+                              getCanvas(),
+                            ],
+                          ),
+                          Container(
+                            padding: EdgeInsets.all(5),
+                            child: PaletteWidget(
+                              onButtonPressed: this._changeColor,
+                              //onEditorOpen: this.openPaletteEditor,
+                              palette: widget.palette,
                             ),
                           ),
-                          getCanvas(),
+                          const Divider(
+                            height: 5,
+                            thickness: 1,
+                          ),
                         ],
                       ),
-                      Container(
-                        padding: EdgeInsets.all(5),
-                        child:PaletteWidget(
-                          onButtonPressed: this._changeColor,
-                          //onEditorOpen: this.openPaletteEditor,
-                          palette: widget.palette,
-                        ),
-                      ),
-                      const Divider(
-                        height: 5,
-                        thickness: 1,
-                      ),
-                      tools,
-                    ],
+                    ),
                   ),
-                ),
-              ),
-              IgnorePointer(
-                ignoring: true,
-                child: Container(
-                  padding: EdgeInsets.all(5.0),
-                  alignment: Alignment.bottomLeft,
-                  child: Column(
-                      children: [
-                        Text(
-                          "history current index:" +
-                              history.currentIndex.toString(),
-                        ),
-                        Text(
-                          "history length:" +
-                              history.stack.length.toString(),
-                        ),
-                        Text(
-                          "is editing:" +
-                              widget.dotCanvas.isEditing.toString(),
-                        ),
-                      ]
+                  Container(
+                    alignment: Alignment.bottomCenter,
+                    child: tools,
                   ),
-                ),
-              ),
-            ]
+                  IgnorePointer(
+                    ignoring: true,
+                    child: Container(
+                      padding: EdgeInsets.all(5.0),
+                      alignment: Alignment.bottomLeft,
+                      child: Column(
+                          children: [
+                            Text(
+                              "history current index:" +
+                                  history.currentIndex.toString(),
+                            ),
+                            Text(
+                              "history length:" +
+                                  history.stack.length.toString(),
+                            ),
+                            Text(
+                              "is editing:" +
+                                  widget.dotCanvas.isEditing.toString(),
+                            ),
+                          ]
+                      ),
+                    ),
+                  ),
+                ]
+            )
         )
     );
   }
@@ -127,7 +143,7 @@ class _MainEditorWidgetState extends State<MainEditorWidget> {
           child: Container(
             width: 500,
             height: 500,
-            margin: const EdgeInsets.all(10.0),
+            margin: const EdgeInsets.all(0.0),
             child: CustomPaint(
               painter: CanvasPainter(
                   this.widget.dotCanvas, this.widget.palette
@@ -150,31 +166,6 @@ class _MainEditorWidgetState extends State<MainEditorWidget> {
     );
   }
 
-  void _changeTools(int type) {
-    if (type == ToolsID.pen) {
-      setBrush(BrushType.pen);
-    }
-    else if (type == ToolsID.bucket) {
-      setBrush(BrushType.bucket);
-    } else if (type == ToolsID.rect) {
-      setBrush(BrushType.rect);
-    } else if (type == ToolsID.circle) {
-      setBrush(BrushType.circle);
-    }
-    else if (type == ToolsID.undo) {
-      undo();
-    } else if (type == ToolsID.redo) {
-      redo();
-    } else if (type == ToolsID.clear) {
-      widget.dotCanvas.clear();
-      addHistory();
-    } else if (type == ToolsID.line) {
-      setBrush(BrushType.line);
-    } else if (type == ToolsID.spoit) {
-      setBrush(BrushType.spoit);
-    }
-  }
-
   void onCanvasOptionSelected(CanvasOption value) {
     setState(() {
       if (value == CanvasOption.flipX) {
@@ -192,9 +183,6 @@ class _MainEditorWidgetState extends State<MainEditorWidget> {
       else if (value == CanvasOption.rotateR) {
         widget.dotCanvas.rotateRight();
         addHistory();
-      }
-      else if (value == CanvasOption.move) {
-        setBrush(BrushType.move);
       }
     });
   }
@@ -216,7 +204,9 @@ class _MainEditorWidgetState extends State<MainEditorWidget> {
   }
 
   void _changeColor(int id) {
-    widget.palette.currentColor = id;
+    setState(() {
+      widget.palette.currentColor = id;
+    });
   }
 
   void addHistory() {
@@ -227,8 +217,8 @@ class _MainEditorWidgetState extends State<MainEditorWidget> {
     print("on tap");
     Cell pos = toPosition(details.localPosition);
     setState(() {
-      brush.onPressEnter(pos.x, pos.y);
-      brush.onPressExit(pos.x, pos.y);
+      canvasTools.currentBrush.onPressEnter(pos.x, pos.y);
+      canvasTools.currentBrush.onPressExit(pos.x, pos.y);
       addHistory();
     });
   }
@@ -237,7 +227,7 @@ class _MainEditorWidgetState extends State<MainEditorWidget> {
     print("on pan start");
     Cell pos = toPosition(details.localPosition);
     setState(() {
-      brush.onPressEnter(pos.x, pos.y);
+      canvasTools.currentBrush.onPressEnter(pos.x, pos.y);
     });
     currentCell = Cell(pos.x, pos.y);
   }
@@ -246,7 +236,7 @@ class _MainEditorWidgetState extends State<MainEditorWidget> {
     print("on drag");
     Cell pos = toPosition(details.localPosition);
     setState(() {
-      brush.onPress(pos.x, pos.y);
+      canvasTools.currentBrush.onPress(pos.x, pos.y);
     });
     currentCell = Cell(pos.x, pos.y);
   }
@@ -254,7 +244,7 @@ class _MainEditorWidgetState extends State<MainEditorWidget> {
   void _onPanEnd(DragEndDetails details) {
     print("on pan end");
     setState(() {
-      brush.onPressExit(currentCell.x, currentCell.y);
+      canvasTools.currentBrush.onPressExit(currentCell.x, currentCell.y);
       addHistory();
     });
   }
@@ -266,10 +256,6 @@ class _MainEditorWidgetState extends State<MainEditorWidget> {
     var x = (position.dx / rectSizeX).floor();
     var y = (position.dy / rectSizeY).floor();
     return Cell(x, y);
-  }
-
-  void setBrush(BrushType type) {
-    brush = BrushFactory.getBrush(type, widget.dotCanvas, widget.palette);
   }
 
   void undo() {

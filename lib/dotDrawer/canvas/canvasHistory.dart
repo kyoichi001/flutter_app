@@ -1,6 +1,6 @@
 import 'dart:collection';
-import 'dotcanvas.dart';
 
+//キャンバスの操作履歴の管理
 class CanvasHistory {
   int sizeX;
   int sizeY;

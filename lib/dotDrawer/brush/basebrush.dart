@@ -1,5 +1,5 @@
-import 'package:flutter_app/dotDrawer/dotcanvas.dart';
-import 'package:flutter_app/dotDrawer/palette.dart';
+import 'package:flutter_app/dotDrawer/canvas/dotcanvas.dart';
+import 'package:flutter_app/dotDrawer/palette/palette.dart';
 
 
 abstract class BaseBrush{

@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/filesave.dart';
 import 'package:path_provider/path_provider.dart';
 import '../encodeImg.dart';
-import 'dotcanvas.dart';
+import 'canvas/dotcanvas.dart';
 import 'mainEditor.dart';
-import 'palette.dart';
+import 'palette/palette.dart';
 
 class EditorPage extends StatelessWidget with WidgetsBindingObserver {
   DotCanvas dotCanvas = DotCanvas();

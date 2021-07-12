@@ -40,8 +40,8 @@ class MainWigetState extends State<MainWiget> {
   @override
   Widget build(BuildContext context) {
     List<Widget> _widgetOptions = <Widget>[
-      HomePage(),
-      SettingsPage(settings: settings,)
+      HomePage(worksAxisCount: settings.worksSize,),
+      SettingsPage(settings: settings,onSettingsChanged: _onSettingsChanged,)
     ];
 
     return Scaffold(
@@ -71,6 +71,16 @@ class MainWigetState extends State<MainWiget> {
   void _onItemTapped(int index){
     setState(() {
       _selectedIndex = index;
+    });
+  }
+  void _onSettingsChanged(){
+    if(settings.nightMode){
+
+    }else{
+
+    }
+    setState(() {
+
     });
   }
 }
